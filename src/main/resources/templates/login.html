@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>悦管家消息系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <!-- load css -->
+    <link rel="stylesheet" type="text/css" href="layui/css/layui.css" media="all">
+    <link rel="stylesheet" type="text/css" href="css/login.css" media="all">
+</head>
+<body>
+<div class="layui-canvs"></div>
+<form class="layui-layout layui-layout-login" action="/jielin-message/login" method="post">
+    <h1>
+
+        <div style="text-align: center;height: 80px">
+            <img alt="" src="images/logo.png">
+        </div>
+        <strong>悦管家推送系统</strong>
+        <span class="help-block" style="color: red;font-size: 15px" th:if="${param.error}" th:text="用户名或密码错误"></span>
+    </h1>
+    <div class="layui-user-icon larry-login">
+        <input type="text" name="username" placeholder="账号" class="login_txtbx"/>
+    </div>
+    <div class="layui-pwd-icon larry-login">
+        <input type="password" name="password" placeholder="密码" class="login_txtbx"/>
+    </div>
+    <div class="layui-submit larry-login">
+        <input type="submit" value="立即登陆" class="submit_btn"/>
+    </div>
+</form>
+<script type="text/javascript" src="layui/lay/dest/layui.all.js"></script>
+<script type="text/javascript" src="js/login.js"></script>
+<script type="text/javascript" src="js/jparticle.jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $(".layui-canvs").jParticle({
+            background: "#9DCCC9",
+            color: "#E6E6E6"
+        });
+    });
+</script>
+</body>
+</html>
