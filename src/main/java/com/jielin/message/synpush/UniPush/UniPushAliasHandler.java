@@ -23,7 +23,6 @@ import java.util.Optional;
  */
 @Service
 @Slf4j
-@SuppressWarnings("unused")
 public class UniPushAliasHandler {
 
     @Autowired
@@ -59,7 +58,7 @@ public class UniPushAliasHandler {
         if (gtAliasPos.size() == 0) {
             gtAliasDao.insert(gtAliasPo);
         }
-        System.out.println("绑定结果：" + ret.getResponse());
+        log.info("绑定结果：" + ret.getResponse().toString());
         return ret.getResponse().get("result").equals("ok");
     }
 

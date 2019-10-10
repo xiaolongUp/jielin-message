@@ -1,7 +1,6 @@
 package com.jielin.message.dto;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -11,7 +10,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@NoArgsConstructor
 @SuppressWarnings("unused")
 public class ResponseDto<T> {
 
@@ -30,9 +28,31 @@ public class ResponseDto<T> {
      */
     private T data;
 
-    public ResponseDto(String message) {
+    /**
+     * 不带参数的正确的返回结果
+     */
+    public ResponseDto() {
         this.code = 0;
+    }
+
+    /**
+     * 错误返回的结果
+     *
+     * @param message 错误信息描述
+     */
+    public ResponseDto(String message) {
+        this.code = -1;
         this.message = message;
+    }
+
+    /**
+     * 带参数正确的返回结果
+     *
+     * @param data 需要返回的数据
+     */
+    public ResponseDto(T data) {
+        this.code = 0;
+        this.data = data;
     }
 
     public ResponseDto(int code, String message) {

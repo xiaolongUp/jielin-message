@@ -122,7 +122,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         Target target = new Target();
 
         target.setAppId(appId);
-        //todo 查询用户绑定的别名的关系
         String alias = gtAliasDao.selectAliasByPhone(paramDto.getAppType(), paramDto.getPhoneNumber());
         target.setAlias(alias); //别名需要提前绑定
         IGtPush pushClient = getPushClient(paramDto.getAppType());

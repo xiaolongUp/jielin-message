@@ -29,7 +29,7 @@ public class GtBindAliasController {
         if (result) {
             return new ResponseDto<>();
         } else {
-            return new ResponseDto<>(-1, "别名绑定失败！");
+            return new ResponseDto<>("别名绑定失败！");
         }
 
     }
@@ -42,7 +42,7 @@ public class GtBindAliasController {
         if (gtAliasPos.size() > 0) {
             return new ResponseDto<>();
         } else {
-            return new ResponseDto<>(-1, "该别名暂未绑定！");
+            return new ResponseDto<>("该别名暂未绑定！");
         }
     }
 
