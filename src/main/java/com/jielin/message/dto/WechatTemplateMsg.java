@@ -46,7 +46,7 @@ public class WechatTemplateMsg {
 
     public class TemplateItem extends HashMap<String, Item> {
 
-        private static final long serialVersionUID = -3728490424738325020L;
+        private static final long serialVersionUID = 1L;
 
         TemplateItem() {
         }

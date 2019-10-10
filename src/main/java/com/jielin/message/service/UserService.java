@@ -21,9 +21,9 @@ public class UserService {
     public ResponseDto<Boolean> register(String phoneNumber) {
         boolean register = smsMsgPush.register(phoneNumber);
         if (register) {
-            return new ResponseDto<>("发送成功");
+            return new ResponseDto<>();
         } else {
-            return new ResponseDto<>(-1, "发送失败");
+            return new ResponseDto<>("发送失败");
         }
 
     }
@@ -32,9 +32,9 @@ public class UserService {
     public ResponseDto<Boolean> smscode(String phoneNumber, String[] param) {
         boolean register = smsMsgPush.smscode(phoneNumber, param);
         if (register) {
-            return new ResponseDto<>("发送成功");
+            return new ResponseDto<>();
         } else {
-            return new ResponseDto<>(-1, "发送失败");
+            return new ResponseDto<>("发送失败");
         }
     }
 }

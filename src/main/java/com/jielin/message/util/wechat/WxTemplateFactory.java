@@ -159,14 +159,13 @@ public class WxTemplateFactory {
                         .toJsonStr();
                 break;
             case CANCEL_ORDER_NOTIFY_SERVICE:
-                data = templateMsg.setTemplate_id(WeChatConfig.CHANGE_SERVICE)
+                data = templateMsg.setTemplate_id(WeChatConfig.CANCEL_ORDER_NOTIFY_SERVICE)
                         .setTouser(toUser)
                         .add(FIRST, "订单取消通知", "#0000FF")
-                        .add(KEYWORD1, "订单编号（123456）", "#0000FF")
-                        .add(KEYWORD2, "日常清洁", "#0000FF")
-                        .add(KEYWORD3, "杨晓龙", "#0000FF")
-                        .add(KEYWORD4, "100.00", "#0000FF")
-                        .add(KEYWORD5, DateUtil.dateToStr(new Date()), "#0000FF")
+                        .add(KEYWORD1, paramDto.getOrderMsg().getServiceUserName(), "#0000FF")
+                        .add(KEYWORD2, paramDto.getOrderMsg().getServiceTime(), "#0000FF")
+                        .add(KEYWORD3, paramDto.getOrderMsg().getOrderNo(), "#0000FF")
+                        .add(REMARK, "为了不影响您的工作，请重新确认已接订单信息，有任何问题请联系悦管家客服400-0022-699", "#0000FF")
                         .toJsonStr();
                 break;
         }

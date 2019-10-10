@@ -67,6 +67,6 @@ public class WeChatConfig {
     public static final String CANCEL_ORDER_NOTIFY_CUSTOM_SERVICE = "YucqZrypDmp_Vz75PLu4u8lkGOYzLWm7DIWFPVuyHuA";
 
     //取消订单通知悦姐的消息模版id
-    public static final String CANCEL_ORDER_NOTIFY_SERVICE = "YucqZrypDmp_Vz75PLu4u8lkGOYzLWm7DIWFPVuyHuA";
+    public static final String CANCEL_ORDER_NOTIFY_SERVICE = "QkLOCasu-PtMhuvUVSvYX_AEfemLF5iv1_BrRRYwZHA";
 
 }
