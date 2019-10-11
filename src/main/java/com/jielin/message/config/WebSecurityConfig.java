@@ -19,7 +19,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     //静态资源所在的目录集合，不做拦截
     private static final String[] STATIC_RESOURCE =
-            new String[]{"/js/**", "/css/**", "/images/**", "/layui/**","/user/**"};
+            new String[]{"/js/**", "/css/**", "/images/**", "/layui/**"};
     //不需要拦截的动态资源
     private static final String[] HTTP_RESOURCE =
             new String[]{"/login", "/push/**", "/user/**", "/gt/**"};
