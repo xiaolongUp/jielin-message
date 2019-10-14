@@ -67,8 +67,9 @@ public class UniPushHandler implements AppMsgPushHandler {
         if (StringUtils.isBlank(appKey)) {
             return false;
         }
-        NotificationTemplate template = createNoticeTemplate(templatePo.getTitle(),
-                String.format(templatePo.getContent(), paramDto.getParams()), appId, appKey);
+        String content = String.format(templatePo.getContent(), paramDto.getParams().toArray(new String[paramDto.getParams().size()]));
+        TransmissionTemplate template = createTransmissionTemplate(templatePo.getTitle(),
+                content, appId, appKey);
         if (!Optional.ofNullable(template).isPresent()) {
             return false;
         }
@@ -164,9 +165,10 @@ public class UniPushHandler implements AppMsgPushHandler {
         template.setTransmissionContent(text);
         template.setTransmissionType(2);
         Notify notify = new Notify();
-        notify.setTitle(title);
-        notify.setContent(text);
-        notify.setIntent("intent:#Intent;launchFlags=0x10000000;package=com.pp.yl;component=com.getui.demo/com.getui.demo.MainActivity;i.parm1=12;end");
+        notify.setTitle("测试标题");
+        notify.setContent("测试内容");
+        //notify.setIntent("intent:#Intent;launchFlags=0x10000000;package=com.pp.yl;component=com.getui.demo/com.getui.demo.MainActivity;i.parm1=12;end");
+        notify.setIntent("intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=测试标题;S.content=测试内容;S.payload=test;end");
         notify.setType(GtReq.NotifyInfo.Type._intent);
         // notify.setUrl("https://dev.getui.com/");
         //notify.setType(Type._url);

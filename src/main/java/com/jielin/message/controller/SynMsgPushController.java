@@ -30,7 +30,7 @@ public class SynMsgPushController {
     @ResponseBody
     public ResponseDto<Boolean> synPush(HttpServletRequest request,
                                         @RequestBody ParamDto paramDto) {
-            synMsgPushService.push(paramDto);
-            return new ResponseDto<>("test");
+        synMsgPushService.push(paramDto);
+        return new ResponseDto<>(0, "test");
     }
 }

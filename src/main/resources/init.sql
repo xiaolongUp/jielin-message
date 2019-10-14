@@ -25,3 +25,14 @@ CREATE TABLE `jl_gt_alias` (
   `phone` varchar(20) NOT NULL COMMENT '手机号',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+--可操作的tab
+CREATE TABLE `jl_msg_menu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL COMMENT '名称',
+  `icon` varchar(50) DEFAULT "" COMMENT '图标',
+  `url` varchar(20) DEFAULT NULL COMMENT '访问uri',
+  `parent` int(11) DEFAULT NULL COMMENT '父节点',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;

@@ -19,7 +19,7 @@ public class AppMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
-        return appMsgPushHandler.sendPushToSingle(paramDto);
+        return appMsgPushHandler.sendPushAll(paramDto);
     }
 
 

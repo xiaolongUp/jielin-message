@@ -9,8 +9,8 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="format-detection" content="telephone=no">
-	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
-	<link rel="stylesheet" href="css/public.css" media="all" />
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all" />
+	<link rel="stylesheet" th:href="@{/css/public.css}" media="all" />
 </head>
 <body class="childrenBody">
 <div class="noFind">
@@ -23,6 +23,6 @@
 		<p>我勒个去，页面被外星人挟持了!</p>
 	</div>
 </div>
-<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
 </body>
 </html>

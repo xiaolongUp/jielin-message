@@ -8,13 +8,15 @@
  * | 有改用时直接复制到对应页面也不影响使用
  * +----------------------------------------------------------------------
  */
-layui.extend({
-	admin: 'js/admin'
+layui.config({
+    base: 'js/'
+}).extend({ //设定模块别名
+    menu: 'menu'
 });
-layui.use(['laydate', 'jquery', 'admin'], function() {
+layui.use(['laydate', 'jquery', 'menu'], function() {
 	var laydate = layui.laydate,
 		$ = layui.jquery,
-		admin = layui.admin;
+		menu = layui.menu;
 	//执行一个laydate实例
 	laydate.render({
 		elem: '#start' //指定元素
@@ -29,7 +31,7 @@ layui.use(['laydate', 'jquery', 'admin'], function() {
 			if($(obj).attr('title') == '启用') {
 
 				//发异步把用户状态进行更改
-				$(obj).attr('title', '停用')
+				$(obj).attr('title', '停用');
 				$(obj).find('i').html('&#xe62f;');
 
 				$(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');

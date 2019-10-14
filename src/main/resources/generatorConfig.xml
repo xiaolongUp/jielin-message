@@ -39,6 +39,6 @@
         </javaClientGenerator>
 
         <!-- 数据表 -->
-        <table tableName="jl_gt_alias" domainObjectName="GtAliasPo" mapperName="GtAliasDao"/>
+        <table tableName="jl_msg_menu" domainObjectName="MenuPo" mapperName="MenuDao"/>
     </context>
 </generatorConfiguration>

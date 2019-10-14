@@ -1,7 +1,7 @@
 ﻿
 @font-face {
     font-family: 'adminthemesregular';
-    src: url('font/adminthemes-webfont.eot');
+    src: url('./font/adminthemes-webfont.eot');
     src: url('font/adminthemes-webfont.eot?#iefix') format('embedded-opentype'),
          url('font/adminthemes-webfont.woff2') format('woff2'),
          url('font/adminthemes-webfont.woff') format('woff'),

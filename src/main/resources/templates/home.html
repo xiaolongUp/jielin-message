@@ -1,16 +1,15 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>悦管家消息推送系统</title>
+    <title>悦管家消息系统</title>
     <meta name="renderer" content="webkit|ie-comp|ie-stand">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon" />
-    <link rel="stylesheet" href="css/font.css">
-    <link rel="stylesheet" href="css/weadmin.css">
-    <script type="text/javascript" src="layui/layui.js" charset="utf-8"></script>
+    <link rel="shortcut icon" th:href="@{/images/favicon.png}"  type="image/x-icon" />
+    <link rel="stylesheet" th:href="@{/css/font.css}">
+    <link rel="stylesheet" th:href="@{/css/weadmin.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}" charset="utf-8"></script>
 </head>
 
 <body>
@@ -24,14 +23,16 @@
     </div>
     <ul class="layui-nav right fast-add" lay-filter="">
         <li class="layui-nav-item">
-            <a href="javascript:;"><img src="images/favicon.png" class="layui-nav-img" width="30" height="30">Admin</a>
+            <a href="javascript:;"><img th:src="@{/images/favicon.png}" class="layui-nav-img" width="30" height="30">
+                <span th:text="${#request.userPrincipal.getName()}"></span>
+            </a>
             <dl class="layui-nav-child">
                 <!-- 二级菜单 -->
                 <dd>
                     <a href="javascript:;"><i class="layui-icon layui-icon-user"></i>个人信息</a>
                 </dd>
                 <dd>
-                    <a class="loginout" href="logout"><i class="layui-icon layui-icon-close"></i>退出登录</a>
+                    <a class="loginout" href="logout"><i class="layui-icon layui-icon-close-fill"></i>退出登录</a>
                 </dd>
             </dl>
         </li>
@@ -50,7 +51,7 @@
 <div class="page-content">
     <div class="layui-tab tab" lay-filter="wenav_tab" id="WeTabTip" lay-allowclose="true">
         <ul class="layui-tab-title" id="tabName">
-            <li>我的桌面</li>
+            <!--<li>我的桌面</li>-->
         </ul>
         <div class="layui-tab-content">
            <!-- <div class="layui-tab-item layui-show">
@@ -64,43 +65,9 @@
 <!-- 中部结束 -->
 <!-- 底部开始 -->
 <!-- 底部结束 -->
-<script type="text/javascript">
-    //			layui扩展模块的两种加载方式-示例
-    //		    layui.extend({
-    //			  admin: '{/}../../static/js/admin' // {/}的意思即代表采用自有路径，即不跟随 base 路径
-    //			});
-    //			//使用拓展模块
-    //			layui.use('admin', function(){
-    //			  var admin = layui.admin;
-    //			});
-    layui.config({
-        base: 'js/'
-        ,version: '101100'
-    }).extend({ //设定模块别名
-        admin: 'admin'
-        ,menu: 'menu'
-    });
-    layui.use(['jquery', 'admin', 'menu'], function(){
-        var $ = layui.jquery,
-            admin = layui.admin,
-            menu = layui.menu;
-        $(function(){
-            menu.getMenu('json/menu.json');
-            /*var login = JSON.parse(localStorage.getItem("login"));
-            if(login){
-                if(login===0){
-                    window.location.href='login.html';
-                    return false;
-                }else{
-                    return false;
-                }
-            }else{
-                window.location.href='login.html';
-                return false;
-            }*/
-        });
-    });
-
+<script type="text/javascript" th:src="@{/js/home.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    var contextPath = [[@{/}]];
 </script>
 </body>
 <!--Tab菜单右键弹出菜单-->

@@ -20,4 +20,7 @@ public interface MsgPushDao {
     @Cacheable(key = "#root.methodName+':'+#operateType")
     List<MsgPushPo> selectByCondition(@Param("operateType") Integer operateType);
 
+    @Cacheable(key = "#root.methodName")
+    List<MsgPushPo> selectAll();
+
 }
