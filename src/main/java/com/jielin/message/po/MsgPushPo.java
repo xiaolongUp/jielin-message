@@ -1,10 +1,12 @@
 package com.jielin.message.po;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 public class MsgPushPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -19,5 +21,8 @@ public class MsgPushPo implements Serializable {
 
     //推送类型(详情PushTypeEnum)
     private Integer optionValue;
+
+    //是否启用
+    private Boolean enable;
 
 }

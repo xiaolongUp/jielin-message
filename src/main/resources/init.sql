@@ -3,7 +3,9 @@ CREATE TABLE `jl_msg_push` (
   `name` varchar(50) NOT NULL COMMENT '名称',
   `operate_type` tinyint(4) NOT NULL COMMENT '操作类型：详见代码中 OperateTypeEnum',
   `option_value` tinyint(4) NOT NULL COMMENT '需要哪些推送：详见代码中 PushTypeEnum',
-  PRIMARY KEY (`id`)
+  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `operate_type` (`operate_type`,`option_value`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 --app推送的标题和模版内容

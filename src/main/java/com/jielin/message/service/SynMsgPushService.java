@@ -1,7 +1,6 @@
 package com.jielin.message.service;
 
 import com.jielin.message.dao.mongo.OperateLogDao;
-import com.jielin.message.dao.mysql.MsgPushDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.MsgPushPo;
 import com.jielin.message.synpush.MsgPush;
@@ -34,7 +33,7 @@ public class SynMsgPushService {
     private OperateLogDao operateLogDao;
 
     @Autowired
-    private MsgPushDao msgPushDao;
+    private SettingService settingService;
 
     @Autowired
     private SmsMsgPush smsMsgPush;
@@ -44,7 +43,7 @@ public class SynMsgPushService {
         //当微信公众号没有关注且没有配置短信推送时，默认需要推送一条短信
         boolean defaultSmsPush = true;
         //获取需要推送消息的
-        List<MsgPushPo> msgPushes = msgPushDao.selectByCondition(paramDto.getOperateType());
+        List<MsgPushPo> msgPushes = settingService.selectByCondition(paramDto.getOperateType());
         for (MsgPushPo msgPushPo : msgPushes) {
             String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
             if (StringUtils.isNoneBlank(pushHandler)) {

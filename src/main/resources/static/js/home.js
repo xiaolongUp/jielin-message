@@ -1,5 +1,5 @@
 layui.config({
-    base: 'js/'
+    base: './js/'
 }).extend({ //设定模块别名
     menu: 'menu',
     admin: 'admin'
@@ -24,15 +24,5 @@ layui.use(['jquery','admin', 'menu'], function () {
                 });
             }
         });
-        /*$.get(contextPath + "menu", function (data) {
-            if (data != null) {
-                menu.getJsonMenu(JSON.parse(data));
-            } else {
-                layer.alert("权限不足，请联系管理员", function () {
-                    //退出
-                    window.location.href = "/logout";
-                });
-            }
-        });*/
     });
 });

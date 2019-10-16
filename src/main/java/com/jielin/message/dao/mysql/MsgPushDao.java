@@ -2,8 +2,6 @@ package com.jielin.message.dao.mysql;
 
 import com.jielin.message.po.MsgPushPo;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,13 +12,18 @@ import java.util.List;
  * @author yxl
  */
 @Repository
-@CacheConfig(cacheNames = "msgPush")
 public interface MsgPushDao {
 
-    @Cacheable(key = "#root.methodName+':'+#operateType")
     List<MsgPushPo> selectByCondition(@Param("operateType") Integer operateType);
 
-    @Cacheable(key = "#root.methodName")
     List<MsgPushPo> selectAll();
 
+    List<MsgPushPo> selectAllByCondition(MsgPushPo msgPushPo);
+
+    int deleteById(@Param("id") Integer id);
+
+
+    int addRecord(MsgPushPo msgPushPo) ;
+
+    int updateRecord(MsgPushPo msgPushPo);
 }

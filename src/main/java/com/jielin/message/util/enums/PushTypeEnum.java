@@ -46,4 +46,19 @@ public enum PushTypeEnum {
                 return "";
         }
     }
+
+    public static PushTypeEnum valueOf(Integer pushType) {
+        switch (pushType) {
+            case 0:
+                return PushTypeEnum.NO_PUSH;
+            case 1:
+                return PushTypeEnum.SMS_PUSH;
+            case 2:
+                return PushTypeEnum.WX_NP_PUSH;
+            case 3:
+                return PushTypeEnum.APP_PUSH;
+            default:
+                throw new IllegalArgumentException("错误参数");
+        }
+    }
 }

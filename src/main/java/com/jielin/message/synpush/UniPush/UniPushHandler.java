@@ -98,8 +98,6 @@ public class UniPushHandler implements AppMsgPushHandler {
 
         AppTemplatePo templatePo = appTemplateDao.selectByType(paramDto.getOperateType());
         String content = String.format(templatePo.getContent(), paramDto.getParams().toArray(new String[paramDto.getParams().size()]));
-        /*NotificationTemplate template = createNoticeTemplate(templatePo.getTitle(),
-                content);*/
         String appId = config.getUniPush().getAppId(paramDto.getAppType());
         if (StringUtils.isBlank(appId)) {
             return false;
@@ -135,7 +133,7 @@ public class UniPushHandler implements AppMsgPushHandler {
 
     }
 
-    private NotificationTemplate createNoticeTemplate(String title, String text,String appId,String appKey) {
+    private NotificationTemplate createNoticeTemplate(String title, String text, String appId, String appKey) {
         Style0 style = new Style0();
         // STEP2：设置推送标题、推送内容
         style.setTitle(title);
@@ -158,20 +156,18 @@ public class UniPushHandler implements AppMsgPushHandler {
     }
 
     //创建透传消息模版
-    private TransmissionTemplate createTransmissionTemplate(String title, String text,String appId,String appKey) {
+    private TransmissionTemplate createTransmissionTemplate(String title, String content, String appId, String appKey) {
         TransmissionTemplate template = new TransmissionTemplate();
         template.setAppId(appId);
         template.setAppkey(appKey);
-        template.setTransmissionContent(text);
+        template.setTransmissionContent(content);
         template.setTransmissionType(2);
         Notify notify = new Notify();
-        notify.setTitle("测试标题");
-        notify.setContent("测试内容");
-        //notify.setIntent("intent:#Intent;launchFlags=0x10000000;package=com.pp.yl;component=com.getui.demo/com.getui.demo.MainActivity;i.parm1=12;end");
-        notify.setIntent("intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=测试标题;S.content=测试内容;S.payload=test;end");
+        notify.setTitle(title);
+        notify.setContent(content);
+        String intent = "intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=%s;S.content=%s;S.payload=test;end";
+        notify.setIntent(String.format(intent, title, content));
         notify.setType(GtReq.NotifyInfo.Type._intent);
-        // notify.setUrl("https://dev.getui.com/");
-        //notify.setType(Type._url);
         template.set3rdNotifyInfo(notify);//设置第三方通知
         return template;
     }
