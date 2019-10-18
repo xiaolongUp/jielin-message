@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/log")
 public class LogController {
 
+    //获取错误日志
     @RequestMapping
     @ResponseBody
     public void getErrorLog(){

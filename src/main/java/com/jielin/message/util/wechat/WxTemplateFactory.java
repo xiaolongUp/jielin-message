@@ -9,10 +9,11 @@ import com.jielin.message.util.sms.DateUtil;
 import java.util.Date;
 
 /**
- * 生成公众号推送消息的模版
+ * 生成公众号推送消息的模版，舍弃类，使用数据库存储对应的模版信息和拼接参数
  *
  * @author yxl
  */
+@Deprecated
 public class WxTemplateFactory {
 
     private static final String FIRST = "first";

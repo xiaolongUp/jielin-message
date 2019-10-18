@@ -28,7 +28,7 @@ import java.time.Duration;
  */
 @Configuration
 @EnableCaching
-public class RedisConfiguration extends CachingConfigurerSupport {
+public class RedisConfig extends CachingConfigurerSupport {
 
     //默认缓存的数据失效时间为两个小时
     private static final int EXPIRE_TIME = 2;

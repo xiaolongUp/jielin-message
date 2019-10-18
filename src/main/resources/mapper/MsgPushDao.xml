@@ -67,8 +67,6 @@
     <update id="updateRecord" parameterType="com.jielin.message.po.MsgPushPo">
         update jl_msg_push
         set name = #{name},
-        operate_type = #{operateType},
-        option_value = #{optionValue},
         enable = #{enable}
         where id = #{id}
     </update>

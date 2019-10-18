@@ -29,8 +29,6 @@ public class UniPushConfig {
 
     private String customerMasterSecret;
 
-    private String url;
-
     /**
      * 根据app类型获取appId
      * @param type app类型

@@ -37,4 +37,62 @@ CREATE TABLE `jl_msg_menu` (
   `url` varchar(20) DEFAULT NULL COMMENT '访问uri',
   `parent` int(11) DEFAULT NULL COMMENT '父节点',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+--所有推送操作动作类型和描述
+CREATE TABLE `jl_msg_operate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `operate_name` varchar(50) NOT NULL COMMENT '操作名称',
+  `operate_type` tinyint(4) NOT NULL COMMENT '操作类型code',
+  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
+  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+--所有的推送的方式
+CREATE TABLE `jl_msg_option` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `push_name` varchar(20) NOT NULL COMMENT '推送类型的名称',
+  `push_type` tinyint(4) NOT NULL COMMENT '推送类型的code',
+  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
+  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+--uniapp的配置类，获取所有的app的config
+CREATE TABLE `jl_msg_uniapp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `app_type` varchar(20) NOT NULL COMMENT 'app类型',
+  `app_id` varchar(50) NOT NULL COMMENT 'uniapp的appid',
+	`app_secret` varchar(50) NOT NULL COMMENT 'uniapp的app_secret',
+	`app_key` varchar(50) NOT NULL COMMENT 'uniapp的app_key',
+	`master_secret` varchar(50) NOT NULL COMMENT 'uniapp的master_secret',
+	`create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
+  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+--推送消息的模版
+CREATE TABLE `jl_msg_tmp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tmp_id` varchar(50) NOT NULL COMMENT '模版id',
+	`tmp_name` varchar(50) NOT NULL COMMENT '模版名称',
+	`operate_id` int(11) NOT NULL COMMENT 'jl_msg_operate的主键',
+	`option_id` int(11) NOT NULL COMMENT 'jl_msg_option的主键',
+	`first` varchar(255) DEFAULT NULL COMMENT '公众号和小程序的first字段',
+	`param1` varchar(255) DEFAULT NULL COMMENT '共有参数1',
+	`param2` varchar(255) DEFAULT NULL COMMENT '共有参数2',
+	`param3` varchar(255) DEFAULT NULL COMMENT '共有参数3',
+	`param4` varchar(255) DEFAULT NULL COMMENT '共有参数4',
+	`param5` varchar(255) DEFAULT NULL COMMENT '共有参数5',
+	`remark` varchar(255) DEFAULT NULL COMMENT '公众号和小程序的remark字段',
+	`example` text NOT NULL COMMENT '事例',
+	`create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
+  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
+  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
