@@ -2,6 +2,8 @@ package com.jielin.message.dao.mongo;
 
 
 import com.jielin.message.po.Template;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
  * @author yxl
  */
 @Repository
+@CacheConfig(cacheNames = "Template")
 public class TemplateDao extends BaseDao<Template> {
 
     public TemplateDao(MongoTemplate mongoTemplate) {
@@ -20,6 +23,7 @@ public class TemplateDao extends BaseDao<Template> {
     }
 
     //查询所有符合的模版
+    @Cacheable(key = "#root.methodName+':'+#operateType.toString()+':'+#optionType")
     public Template selectByOperateAndPushType(Integer operateType, Integer optionType) {
         Criteria criteria = Criteria.where("operateType")
                 .is(operateType).and("optionType").is(optionType);

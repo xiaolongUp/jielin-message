@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface AdminUserDao {
 
     //查找用户
-    @Cacheable(key = "'findUserByUsername:'.concat(#userName.toString())")
+    @Cacheable(key = "#root.methodName+':'+#userName")
     AdminUserPo findUserByUsername(@Param("userName") String userName);
 
 }

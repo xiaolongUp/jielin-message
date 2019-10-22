@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @CacheConfig(cacheNames = "customUser")
 public interface CustomUserDao {
 
-    @Cacheable(key = "'selectUserIdByPhone:'.concat(#phone.toString())")
+    @Cacheable(key = "#root.methodName+':'+#phone")
     Integer selectUserIdByPhone(@Param("phone") String phone);
 
 }

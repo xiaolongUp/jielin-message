@@ -12,7 +12,7 @@ import java.util.List;
 @CacheConfig(cacheNames = "authMember")
 public interface AuthMemberDao {
 
-    @Cacheable(key = "'selectByCustomId:'.concat(#customId.toString()).concat(#platform)")
+    @Cacheable(key = "#root.methodName+':'+#customId.toString()+':'+#platform")
     List<AuthMemberPo> selectByCustomId(@Param("customId") Integer customId, @Param("platform") String platform);
 
 }

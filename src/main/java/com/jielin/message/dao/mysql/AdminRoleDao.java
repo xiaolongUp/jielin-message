@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface AdminRoleDao {
 
     //根据id查找用户权限
-    @Cacheable(key = "'selectByPrimaryKey:'.concat(#id.toString())")
+    @Cacheable(key = "#root.methodName+':'+#id.toString()")
     AdminRolePo selectByPrimaryKey(@Param("id") Integer id);
 }

@@ -22,6 +22,6 @@ public interface GtAliasDao {
 
     List<GtAliasPo> selectByCid(@Param("cid") String cid);
 
-    @Cacheable(key = "'selectAliasByPhone:'.concat(#appType.toString()).concat(#phone.toString())")
+    @Cacheable(key = "#root.methodName+':'+#appType+':'+#phone")
     String selectAliasByPhone(@Param("appType") String appType, @Param("phone") String phone);
 }

@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 @CacheConfig(cacheNames = "appTemplate")
 public interface AppTemplateDao {
 
-
-    @Cacheable(key = "'selectByType:'.concat(#type.toString())")
+    @Cacheable(key = "#root.methodName+':'+#type.toString()")
     AppTemplatePo selectByType(@Param("type") Integer type);
 
 }

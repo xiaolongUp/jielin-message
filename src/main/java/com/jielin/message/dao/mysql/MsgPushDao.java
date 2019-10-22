@@ -22,7 +22,6 @@ public interface MsgPushDao {
 
     int deleteById(@Param("id") Integer id);
 
-
     int addRecord(MsgPushPo msgPushPo) ;
 
     int updateRecord(MsgPushPo msgPushPo);
