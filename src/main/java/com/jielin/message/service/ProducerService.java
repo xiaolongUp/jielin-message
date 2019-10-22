@@ -7,9 +7,9 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -27,21 +27,15 @@ public class ProducerService {
     private Gson gson;
 
     public void send() {
-        List<String> params = new ArrayList<>();
-        params.add("test");
-        params.add("1111");
+        Map<String,Object> params = new HashMap<>();
+        params.put("customName","yxl");
+        params.put("productName","日常清洁");
+        params.put("money","100.0");
+        params.put("serviceTime","2019-10-15 17:00:00");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(101)
                 .setPhoneNumber("18530076638")
                 .setParams(params);
-        paramDto.getOrderMsg().setOrderNo("123456")
-                .setProductName("日常清洁")
-                .setCustomName("yxl")
-                .setCustomPhone("18530076638")
-                .setServiceTime("2019-08-08 08:08:08")
-                .setServiceUserName("")
-                .setMoney(100.00)
-                .setGender("悦姐");
 
 
         String context = "hello " + new Date();

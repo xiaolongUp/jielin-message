@@ -1,6 +1,5 @@
 package com.jielin.message.synpush.Jpush;
 
-import cn.jiguang.common.ClientConfig;
 import cn.jiguang.common.resp.APIConnectionException;
 import cn.jiguang.common.resp.APIRequestException;
 import cn.jpush.api.JPushClient;
@@ -11,8 +10,6 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.synpush.AppMsgPushHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
 
 /**
  * 极光推送的客户端
@@ -28,10 +25,10 @@ public class JgPushHandler implements AppMsgPushHandler {
 
     private JPushClient jPushClient;
 
-    @PostConstruct
+    /*@PostConstruct
     private void init() {
         this.jPushClient = new JPushClient(config.getJgPush().getMasterSecret(), config.getJgPush().getAppKey(), null, ClientConfig.getInstance());
-    }
+    }*/
 
     /**
      * 给所有的平台和用户都推送消息

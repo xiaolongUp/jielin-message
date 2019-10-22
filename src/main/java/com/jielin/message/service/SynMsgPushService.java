@@ -40,7 +40,7 @@ public class SynMsgPushService {
 
     //根据参数选择不同的推送方式
     public boolean push(ParamDto paramDto) {
-        //当微信公众号没有关注且没有配置短信推送时，默认需要推送一条短信
+        //当没有配置推送规则时，默认需要推送一条短信
         boolean defaultSmsPush = true;
         //获取需要推送消息的
         List<MsgPushPo> msgPushes = settingService.selectByCondition(paramDto.getOperateType());

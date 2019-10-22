@@ -16,11 +16,14 @@ public class MsgPushPo implements Serializable {
     //名称
     private String name;
 
-    //操作类型(详情OperateTypeEnum)
+    //操作类型
     private Integer operateType;
 
-    //推送类型(详情PushTypeEnum)
+    //推送类型
     private Integer optionValue;
+
+    //优先级
+    private Integer priority;
 
     //是否启用
     private Boolean enable;

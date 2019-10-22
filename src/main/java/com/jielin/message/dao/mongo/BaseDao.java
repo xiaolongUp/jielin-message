@@ -16,10 +16,9 @@ import java.lang.reflect.ParameterizedType;
  * @author yxl
  */
 @Repository
-@SuppressWarnings("unused")
 public class BaseDao<T> {
 
-    private final MongoTemplate mongoTemplate;
+    protected final MongoTemplate mongoTemplate;
 
     /**
      * 创建一个 Class 的对象来获取泛型的 Class
@@ -32,7 +31,7 @@ public class BaseDao<T> {
     }
 
 
-    private Class<T> getClz() {
+    protected Class<T> getClz() {
         if (clz == null) {
             clz = ((Class<T>) (((ParameterizedType) (this.getClass().getGenericSuperclass())).getActualTypeArguments()[0]));
         }

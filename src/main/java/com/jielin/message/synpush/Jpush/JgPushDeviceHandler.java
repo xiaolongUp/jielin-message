@@ -1,6 +1,5 @@
 package com.jielin.message.synpush.Jpush;
 
-import cn.jiguang.common.ClientConfig;
 import cn.jiguang.common.resp.APIConnectionException;
 import cn.jiguang.common.resp.APIRequestException;
 import cn.jiguang.common.resp.DefaultResult;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
@@ -29,10 +27,10 @@ public class JgPushDeviceHandler {
 
     private JPushClient jPushClient;
 
-    @PostConstruct
+    /*@PostConstruct
     private void init() {
         this.jPushClient = new JPushClient(config.getJgPush().getMasterSecret(), config.getJgPush().getAppKey(), null, ClientConfig.getInstance());
-    }
+    }*/
 
     /**
      * 绑定手机号码

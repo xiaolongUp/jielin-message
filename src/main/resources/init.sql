@@ -3,6 +3,7 @@ CREATE TABLE `jl_msg_push` (
   `name` varchar(50) NOT NULL COMMENT '名称',
   `operate_type` tinyint(4) NOT NULL COMMENT '操作类型：详见代码中 OperateTypeEnum',
   `option_value` tinyint(4) NOT NULL COMMENT '需要哪些推送：详见代码中 PushTypeEnum',
+  `priority` tinyint(4) NOT NULL DEFAULT '1' COMMENT '优先级，数越大优先级越高',
   `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
   PRIMARY KEY (`id`),
   UNIQUE KEY `operate_type` (`operate_type`,`option_value`)
@@ -69,28 +70,6 @@ CREATE TABLE `jl_msg_uniapp` (
 	`app_secret` varchar(50) NOT NULL COMMENT 'uniapp的app_secret',
 	`app_key` varchar(50) NOT NULL COMMENT 'uniapp的app_key',
 	`master_secret` varchar(50) NOT NULL COMMENT 'uniapp的master_secret',
-	`create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
-  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
-  `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
-
-
---推送消息的模版
-CREATE TABLE `jl_msg_tmp` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tmp_id` varchar(50) NOT NULL COMMENT '模版id',
-	`tmp_name` varchar(50) NOT NULL COMMENT '模版名称',
-	`operate_id` int(11) NOT NULL COMMENT 'jl_msg_operate的主键',
-	`option_id` int(11) NOT NULL COMMENT 'jl_msg_option的主键',
-	`first` varchar(255) DEFAULT NULL COMMENT '公众号和小程序的first字段',
-	`param1` varchar(255) DEFAULT NULL COMMENT '共有参数1',
-	`param2` varchar(255) DEFAULT NULL COMMENT '共有参数2',
-	`param3` varchar(255) DEFAULT NULL COMMENT '共有参数3',
-	`param4` varchar(255) DEFAULT NULL COMMENT '共有参数4',
-	`param5` varchar(255) DEFAULT NULL COMMENT '共有参数5',
-	`remark` varchar(255) DEFAULT NULL COMMENT '公众号和小程序的remark字段',
-	`example` text NOT NULL COMMENT '事例',
 	`create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
   `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
   `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',

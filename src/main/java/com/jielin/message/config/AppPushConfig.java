@@ -2,7 +2,7 @@ package com.jielin.message.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -11,14 +11,15 @@ import org.springframework.context.annotation.Configuration;
  * @author yxl
  */
 @Configuration
-@ConfigurationProperties(prefix = "app-push")
 @Getter
 @Setter
 public class AppPushConfig {
 
     //极光推送配置类
+    @Autowired
     private JgPushConfig jgPush;
 
     //个推推送配置类
+    @Autowired
     private UniPushConfig uniPush;
 }

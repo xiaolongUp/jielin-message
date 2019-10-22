@@ -39,25 +39,27 @@ public class WechatTokenHelper {
     @PostConstruct
     private void initToken() {
         getToken(false);
+        getMpToken(false);
     }
 
-    //获取微信公众号接口访问token
+    //获取微信公众号接口访问token或者小程序的调用接口的token
     public String getToken(boolean fromCache) {
-        String accessToken;
+        String gzhAccessToken;
         if (!fromCache) {
-            accessToken = getAccessToken();
+            gzhAccessToken = getgzhAccessToken();
         } else {
-            String wxAccessToken = redisTemplate.opsForValue().get(MsgConstant.WX_ACCESS_TOKEN);
+            String wxgzhAccessToken = redisTemplate.opsForValue().get(MsgConstant.WX_ACCESS_TOKEN);
             //当微信公众号token不存在时，获取token并保存
-            if (StringUtils.isBlank(wxAccessToken)) {
-                accessToken = getAccessToken();
+            if (StringUtils.isBlank(wxgzhAccessToken)) {
+                gzhAccessToken = getgzhAccessToken();
+            } else {
+                gzhAccessToken = wxgzhAccessToken;
             }
-            accessToken = wxAccessToken;
         }
-        return accessToken;
+        return gzhAccessToken;
     }
 
-    private String getAccessToken() {
+    private String getgzhAccessToken() {
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.ACCESS_TOKEN_URL)
                 .queryParam("grant_type", "client_credential")
                 .queryParam("appid", weChatConfig.getGzhAppid())
@@ -69,8 +71,45 @@ public class WechatTokenHelper {
                 }).getBody();
         String wxToken = (String) result.get(MsgConstant.WX_TOKEN_KEY);
         Integer wxExpiresIn = (Integer) result.get(MsgConstant.WX_EXPIRES_IN);
-        weChatConfig.setAccessToken(wxToken);
+        weChatConfig.setGzhAccessToken(wxToken);
         redisTemplate.opsForValue().set(MsgConstant.WX_ACCESS_TOKEN, wxToken, wxExpiresIn - 300, TimeUnit.SECONDS);
         return wxToken;
     }
+
+
+    //获取微信小程序的调用接口的token
+    public String getMpToken(boolean fromCache) {
+        String mpAccessToken;
+        if (!fromCache) {
+            mpAccessToken = getMpAccessToken();
+        } else {
+            String wxMpAccessToken = redisTemplate.opsForValue().get(MsgConstant.WX_MP_ACCESS_TOKEN);
+            //当微信小程序token不存在时，获取token并保存
+            if (StringUtils.isBlank(wxMpAccessToken)) {
+                mpAccessToken = getMpAccessToken();
+            } else {
+                mpAccessToken = wxMpAccessToken;
+            }
+        }
+        return mpAccessToken;
+    }
+
+    private String getMpAccessToken() {
+        UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.ACCESS_TOKEN_URL)
+                .queryParam("grant_type", "client_credential")
+                .queryParam("appid", weChatConfig.getMpAppid())
+                .queryParam("secret", weChatConfig.getMpAppsecret()).build();
+        Map<String, Object> result = restTemplate.exchange(builder.toUriString(),
+                HttpMethod.POST,
+                null,
+                new ParameterizedTypeReference<Map<String, Object>>() {
+                }).getBody();
+        String wxToken = (String) result.get(MsgConstant.WX_TOKEN_KEY);
+        Integer wxExpiresIn = (Integer) result.get(MsgConstant.WX_EXPIRES_IN);
+        weChatConfig.setMpAccessToken(wxToken);
+        redisTemplate.opsForValue().set(MsgConstant.WX_MP_ACCESS_TOKEN, wxToken, wxExpiresIn - 300, TimeUnit.SECONDS);
+        return wxToken;
+    }
+
+
 }

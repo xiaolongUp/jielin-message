@@ -32,7 +32,7 @@
         select
         <include refid="Base_Column_List"/>
         from jl_auth_member
-        where custom_id=#{customId} and platform = 'wechat_oa'
+        where custom_id=#{customId} and platform = #{platform}
     </select>
 
 </mapper>

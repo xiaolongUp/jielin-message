@@ -12,20 +12,20 @@ import com.gexin.rp.sdk.template.NotificationTemplate;
 import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.gexin.rp.sdk.template.style.Style0;
 import com.jielin.message.config.AppPushConfig;
-import com.jielin.message.dao.mysql.AppTemplateDao;
+import com.jielin.message.config.UniPushConfig;
+import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dao.mysql.GtAliasDao;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.po.AppTemplatePo;
+import com.jielin.message.po.Template;
 import com.jielin.message.synpush.AppMsgPushHandler;
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.TemplateFactory;
+import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 个推推送的client
@@ -39,37 +39,49 @@ public class UniPushHandler implements AppMsgPushHandler {
     private AppPushConfig config;
 
     @Autowired
-    private AppTemplateDao appTemplateDao;
+    private TemplateDao templateDao;
 
     @Autowired
     private GtAliasDao gtAliasDao;
 
-    private IGtPush providerClient;
+    @Autowired
+    private TemplateFactory templateFactory;
 
-    private IGtPush customerClient;
+    private Map<String, IGtPush> IGtPushMap = new HashMap<>();
+
 
     // STEP1：获取应用基本信息
     @PostConstruct
     private void init() {
-        this.providerClient = new IGtPush(config.getUniPush().getProviderAppKey(), config.getUniPush().getProviderMasterSecret());
-        this.customerClient = new IGtPush(config.getUniPush().getCustomerAppKey(), config.getUniPush().getCustomerMasterSecret());
+        //初始化所有的uniapp的client
+        for (Map.Entry<String, UniPushConfig.UniPush> uniPushEntry : config.getUniPush().getUniPushMap().entrySet()) {
+            IGtPush iGtPush = new IGtPush(uniPushEntry.getValue().getAppKey(), uniPushEntry.getValue().getMasterSecret());
+            this.IGtPushMap.put(uniPushEntry.getKey(), iGtPush);
+        }
     }
 
     // 推送通知消息给所有的用户
     @Override
     public boolean sendPushAll(ParamDto paramDto) throws Exception {
-        AppTemplatePo templatePo = appTemplateDao.selectByType(paramDto.getOperateType());
-        String appId = config.getUniPush().getAppId(paramDto.getAppType());
-        if (StringUtils.isBlank(appId)) {
+        Template tmp = templateDao.
+                selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
+        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(paramDto.getAppType());
+        if (!Optional.ofNullable(tmp).isPresent()) {
             return false;
         }
-        String appKey = config.getUniPush().getAppKey(paramDto.getAppType());
-        if (StringUtils.isBlank(appKey)) {
+        if (!Optional.ofNullable(uniPush).isPresent()) {
             return false;
         }
-        String content = String.format(templatePo.getContent(), paramDto.getParams().toArray(new String[paramDto.getParams().size()]));
-        TransmissionTemplate template = createTransmissionTemplate(templatePo.getTitle(),
-                content, appId, appKey);
+
+        String appId = uniPush.getAppId();
+        String appKey = uniPush.getAppKey();
+        String appTemplate = templateFactory.newTemplate(paramDto, PushTypeEnum.APP_PUSH.getType(), null);
+        if (StringUtils.isBlank(appTemplate)) {
+            log.info("生成的空模版：{}", appTemplate);
+            return false;
+        }
+        TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
+                appTemplate, appId, appKey);
         if (!Optional.ofNullable(template).isPresent()) {
             return false;
         }
@@ -83,12 +95,13 @@ public class UniPushHandler implements AppMsgPushHandler {
         message.setOfflineExpireTime(24 * 1000 * 3600);  // 时间单位为毫秒
 
         // STEP6：执行推送
-        IGtPush pushClient = getPushClient(paramDto.getAppType());
+        IGtPush pushClient = this.IGtPushMap.get(paramDto.getAppType());
         if (!Optional.ofNullable(pushClient).isPresent()) {
             return false;
         }
         PushResult result = (PushResult) pushClient.pushMessageToApp(message);
-        log.info(result.getResponse().toString());
+        log.info("app推送结果:{}",result.getResponse().toString());
+        //当result为RepeatedContent时，个推不允许15分钟重复发送数据
         return result.getResponse().get("result").equals("ok");
     }
 
@@ -96,18 +109,24 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Override
     public boolean sendPushToSingle(ParamDto paramDto) throws Exception {
 
-        AppTemplatePo templatePo = appTemplateDao.selectByType(paramDto.getOperateType());
-        String content = String.format(templatePo.getContent(), paramDto.getParams().toArray(new String[paramDto.getParams().size()]));
-        String appId = config.getUniPush().getAppId(paramDto.getAppType());
-        if (StringUtils.isBlank(appId)) {
+        Template tmp = templateDao.
+                selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
+        if (!Optional.ofNullable(tmp).isPresent()) {
             return false;
         }
-        String appKey = config.getUniPush().getAppKey(paramDto.getAppType());
-        if (StringUtils.isBlank(appKey)) {
+        String appTemplate = templateFactory.newTemplate(paramDto, PushTypeEnum.APP_PUSH.getType(), null);
+        if (StringUtils.isBlank(appTemplate)) {
             return false;
         }
-        TransmissionTemplate template = createTransmissionTemplate(templatePo.getTitle(),
-                content, appId, appKey);
+        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(paramDto.getAppType());
+        if (!Optional.ofNullable(uniPush).isPresent()) {
+            return false;
+        }
+
+        String appId = uniPush.getAppId();
+        String appKey = uniPush.getAppKey();
+        TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
+                appTemplate, appId, appKey);
         if (!Optional.ofNullable(template).isPresent()) {
             return false;
         }
@@ -123,12 +142,12 @@ public class UniPushHandler implements AppMsgPushHandler {
         target.setAppId(appId);
         String alias = gtAliasDao.selectAliasByPhone(paramDto.getAppType(), paramDto.getPhoneNumber());
         target.setAlias(alias); //别名需要提前绑定
-        IGtPush pushClient = getPushClient(paramDto.getAppType());
+        IGtPush pushClient = this.IGtPushMap.get(paramDto.getAppType());
         if (!Optional.ofNullable(pushClient).isPresent()) {
             return false;
         }
         IPushResult result = pushClient.pushMessageToSingle(message, target);
-
+        log.info("app推送结果:{}",result.getResponse().toString());
         return result.getResponse().get("result").equals("ok");
 
     }
@@ -172,21 +191,5 @@ public class UniPushHandler implements AppMsgPushHandler {
         return template;
     }
 
-    /**
-     * 根据app类型判断使用哪个个推的pushClient
-     *
-     * @param type app类型
-     * @return 个推pushClient
-     */
-    private IGtPush getPushClient(String type) {
-        switch (type) {
-            case MsgConstant.CUSTOMER_APP:
-                return this.customerClient;
-            case MsgConstant.PROVIDER_APP:
-                return this.providerClient;
-            default:
-                return null;
-        }
-    }
 
 }
