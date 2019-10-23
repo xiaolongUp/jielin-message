@@ -13,11 +13,12 @@ import java.util.Map;
 
 
 /**
- * rabbitMq生产者
+ * rabbitMq生产者,测试通过生产者生成消息
  *
  * @author yxl
  */
 @Service
+@Deprecated
 public class ProducerService {
 
     @Autowired

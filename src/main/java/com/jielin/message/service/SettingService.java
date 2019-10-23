@@ -28,8 +28,8 @@ public class SettingService {
     private MsgPushDao msgPushDao;
 
     @Cacheable(key = "#root.methodName+':'+#operateType")
-    public List<MsgPushPo> selectByCondition(Integer operateType) {
-        return msgPushDao.selectByCondition(operateType);
+    public List<MsgPushPo> selectEnableByCondition(Integer operateType) {
+        return msgPushDao.selectEnableByCondition(operateType);
     }
 
     @Cacheable(key = "#root.methodName+':'+#pageNo+':'+#pageSize")

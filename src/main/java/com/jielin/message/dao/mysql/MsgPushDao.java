@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface MsgPushDao {
 
-    List<MsgPushPo> selectByCondition(@Param("operateType") Integer operateType);
+    List<MsgPushPo> selectEnableByCondition(@Param("operateType") Integer operateType);
 
     List<MsgPushPo> selectAll();
 

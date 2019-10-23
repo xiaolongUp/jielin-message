@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +32,9 @@ public class SynMsgPushController {
 
     @PostMapping(value = "/syn", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
-    public ResponseDto<Boolean> synPush(HttpServletRequest request,
-                                        @RequestBody ParamDto paramDto) {
-        synMsgPushService.push(paramDto);
-        return new ResponseDto<>(0, "test");
+    public ResponseDto<Boolean> synPush(@RequestBody ParamDto paramDto) {
+        Boolean push = synMsgPushService.push(paramDto);
+        return new ResponseDto<>(push);
     }
 
 
@@ -44,11 +42,11 @@ public class SynMsgPushController {
     @ResponseBody
     public void insert() {
         Template template = new Template();
-        Map<String,String> params = new HashMap<>();
-        params.put("keyword1","customName");
-        params.put("keyword2","productName");
-        params.put("keyword3","money");
-        params.put("keyword4","serviceTime");
+        Map<String, String> params = new HashMap<>();
+        params.put("keyword1", "customName");
+        params.put("keyword2", "productName");
+        params.put("keyword3", "money");
+        params.put("keyword4", "serviceTime");
         template.setTmpId("103050")
                 .setTmpName("订单创建成功短信模板")
                 .setOperateType(101).setOptionType(1)

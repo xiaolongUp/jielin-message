@@ -26,11 +26,13 @@
         name, operate_type, option_value, enable
     </sql>
 
-    <select id="selectByCondition" resultType="com.jielin.message.po.MsgPushPo">
+    <select id="selectEnableByCondition" resultType="com.jielin.message.po.MsgPushPo">
         select
         <include refid="Base_Column_List"/>
         from jl_msg_push
         where operate_type =#{operateType}
+        and enable =true
+        order by priority desc
     </select>
 
     <select id="selectAll" resultType="com.jielin.message.po.MsgPushPo">

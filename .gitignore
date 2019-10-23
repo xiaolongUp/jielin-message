@@ -33,3 +33,6 @@ build/
 
 #Log file
 *.log
+
+# JRebel
+rebel.xml
