@@ -15,7 +15,7 @@ public class GtAliasPo implements Serializable {
     //别名
     private String alias;
 
-    //所属类型。悦姐app,客户app
+    //app类型。悦姐app,客户app,悦所等
     private String appType;
 
     //电话号码
