@@ -56,6 +56,8 @@ public class UniPushAliasHandler {
         IAliasResult ret = pushClient.bindAlias(appId, gtAliasPo.getAlias(), gtAliasPo.getCid());
         List<GtAliasPo> gtAliasPos = gtAliasDao.selectByCid(gtAliasPo.getCid());
         if (gtAliasPos.size() == 0) {
+            //别名形式为app类型+phone
+            gtAliasPo.setAlias(gtAliasPo.getAppType() + gtAliasPo.getPhone());
             gtAliasDao.insert(gtAliasPo);
         }
         log.info("绑定结果：" + ret.getResponse().toString());
