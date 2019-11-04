@@ -14,6 +14,9 @@ import java.util.Map;
 @Accessors(chain = true)
 public class ParamDto  {
 
+    //来自哪个平台（悦管家平台，悦所平台等）
+    private Integer platform;
+
     //需要发送的推送的类型（OperateTypeEnum）
     private Integer operateType;
 

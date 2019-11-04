@@ -27,13 +27,13 @@ public class SettingService {
     @Autowired
     private MsgPushDao msgPushDao;
 
-    @Cacheable(key = "#root.methodName+':'+#operateType")
-    public List<MsgPushPo> selectEnableByCondition(Integer operateType) {
-        return msgPushDao.selectEnableByCondition(operateType);
+    @Cacheable(key = "#root.methodName+':'+#operateType+':'+#platform")
+    public List<MsgPushPo> selectEnableByCondition(Integer operateType, Integer platform) {
+        return msgPushDao.selectEnableByCondition(operateType, platform);
     }
 
     @Cacheable(key = "#root.methodName+':'+#pageNo+':'+#pageSize")
-    public ResponseDto<PageData<MsgPushPo>> selectAll(int pageNo, int pageSize) {
+    public ResponseDto<PageData<MsgPushPo>> selectPage(int pageNo, int pageSize) {
         ResponseDto<PageData<MsgPushPo>> responseDto = new ResponseDto<>();
         //获取分页的数据信息
         PageHelper.startPage(pageNo, pageSize);
@@ -46,7 +46,7 @@ public class SettingService {
     }
 
     @Cacheable(key = "#root.methodName+':'+#pageNo+':'+#pageSize+':'+#po.toString()")
-    public ResponseDto<PageData<MsgPushPo>> selectAllByCondition(int pageNo, int pageSize, MsgPushPo po) {
+    public ResponseDto<PageData<MsgPushPo>> selectPageByCondition(int pageNo, int pageSize, MsgPushPo po) {
         ResponseDto<PageData<MsgPushPo>> responseDto = new ResponseDto<>();
         //获取分页的数据信息
         PageHelper.startPage(pageNo, pageSize);
@@ -79,7 +79,7 @@ public class SettingService {
     public ResponseDto addRecord(MsgPushPo msgPushPo) {
         ResponseDto responseDto;
         List<MsgPushPo> msgPushPos = msgPushDao.selectAllByCondition(msgPushPo);
-        if (msgPushPos.size()>0){
+        if (msgPushPos.size() > 0) {
             return new ResponseDto("不可以重复插入！");
         }
 

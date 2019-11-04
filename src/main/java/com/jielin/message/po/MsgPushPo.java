@@ -13,14 +13,17 @@ public class MsgPushPo implements Serializable {
 
     private Integer id;
 
-    //名称
-    private String name;
+    //描述
+    private String dsc;
 
     //操作类型
     private Integer operateType;
 
     //推送类型
     private Integer optionValue;
+
+    //平台类型
+    private Integer platform;
 
     //优先级
     private Integer priority;

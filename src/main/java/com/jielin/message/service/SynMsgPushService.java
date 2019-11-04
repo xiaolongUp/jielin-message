@@ -1,8 +1,10 @@
 package com.jielin.message.service;
 
-import com.jielin.message.dao.mongo.OperateLogDao;
+import com.jielin.message.dao.mysql.OperateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.MsgPushPo;
+import com.jielin.message.po.OperatePo;
+import com.jielin.message.po.OperatePoCriteria;
 import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.synpush.SmsMsgPush;
 import com.jielin.message.util.enums.PushTypeEnum;
@@ -31,7 +33,7 @@ public class SynMsgPushService {
     private Map<String, MsgPush> msgPushMap;
 
     @Autowired
-    private OperateLogDao operateLogDao;
+    private OperateDao operateDao;
 
     @Autowired
     private SettingService settingService;
@@ -42,42 +44,64 @@ public class SynMsgPushService {
     //根据参数选择不同的推送方式
     public boolean push(ParamDto paramDto) {
         boolean result = false;
-        //获取需要推送消息的
-        List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType());
-        //当没有配置推送规则时，默认需要推送一条短信
-        if (msgPushes.isEmpty()) {
-            try {
-                result = smsMsgPush.pushMsg(paramDto);
-            } catch (Exception e) {
-                //do nothing
+        OperatePoCriteria criteria = new OperatePoCriteria();
+        criteria.createCriteria()
+                .andOperateTypeEqualTo(paramDto.getOperateType())
+                .andPushAllEqualTo(true);
+        List<OperatePo> operatePos = operateDao.selectByExample(criteria);
+        //所有的推送方式都去推送该消息
+        if (!operatePos.isEmpty()){
+            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(), paramDto.getPlatform());
+            for (MsgPushPo msgPushPo : msgPushes) {
+                String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
+                if (StringUtils.isNoneBlank(pushHandler)) {
+                    MsgPush push = msgPushMap.get(pushHandler);
+                    try {
+                        result = push.pushMsg(paramDto);
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                }
             }
-        }
-        //当只配置app推送的时候，同样需要推送一条短信推送
-        if (msgPushes.size() == 1
-                && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
-            try {
-                result = smsMsgPush.pushMsg(paramDto);
-            } catch (Exception e) {
-                //do nothing
-            }
-
-        }
-        for (MsgPushPo msgPushPo : msgPushes) {
-            String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
-            if (StringUtils.isNoneBlank(pushHandler)) {
-                MsgPush push = msgPushMap.get(pushHandler);
+        }else {
+            //获取需要推送消息的
+            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(), paramDto.getPlatform());
+            //当没有配置推送规则时，默认需要推送一条短信
+            if (msgPushes.isEmpty()) {
                 try {
-                    result = push.pushMsg(paramDto);
+                    result = smsMsgPush.pushMsg(paramDto);
                 } catch (Exception e) {
                     //do nothing
                 }
-                //当有规则发送消息成功且发送消息的不为app时，中断
-                if (result && !(push instanceof SmsMsgPush)) {
-                    break;
-                }
             }
+            //当只配置app推送的时候，同样需要推送一条短信推送
+            if (msgPushes.size() == 1
+                    && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
+                try {
+                    result = smsMsgPush.pushMsg(paramDto);
+                } catch (Exception e) {
+                    //do nothing
+                }
 
+            }
+            for (MsgPushPo msgPushPo : msgPushes) {
+                String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
+                if (StringUtils.isNoneBlank(pushHandler)) {
+                    MsgPush push = msgPushMap.get(pushHandler);
+                    try {
+                        result = push.pushMsg(paramDto);
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                    //当有规则发送消息成功且发送消息的不为app时，中断
+                    if (result && !(push instanceof SmsMsgPush)) {
+                        break;
+                    }
+                }
+
+            }
         }
+
         return result;
     }
 

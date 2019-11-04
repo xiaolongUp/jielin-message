@@ -39,6 +39,6 @@
         </javaClientGenerator>
 
         <!-- 数据表 -->
-        <table tableName="jl_msg_tmp" domainObjectName="TmpPo" mapperName="TmpDao"/>
+        <table tableName="jl_msg_operate" domainObjectName="OperatePo" mapperName="OperateDao"/>
     </context>
 </generatorConfiguration>

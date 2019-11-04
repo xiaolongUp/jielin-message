@@ -43,9 +43,9 @@ public class SettingController {
             @RequestParam(defaultValue = "10") int pageSize,
             MsgPushPo msgPushPo) {
         if (Optional.ofNullable(msgPushPo).isPresent()) {
-            return settingService.selectAllByCondition(pageNo, pageSize, msgPushPo);
+            return settingService.selectPageByCondition(pageNo, pageSize, msgPushPo);
         } else {
-            return settingService.selectAll(pageNo, pageSize);
+            return settingService.selectPage(pageNo, pageSize);
         }
 
     }

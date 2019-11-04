@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface MsgPushDao {
 
-    List<MsgPushPo> selectEnableByCondition(@Param("operateType") Integer operateType);
+    List<MsgPushPo> selectEnableByCondition(@Param("operateType") Integer operateType, @Param("platform") Integer platform);
 
     List<MsgPushPo> selectAll();
 
@@ -22,7 +22,7 @@ public interface MsgPushDao {
 
     int deleteById(@Param("id") Integer id);
 
-    int addRecord(MsgPushPo msgPushPo) ;
+    int addRecord(MsgPushPo msgPushPo);
 
     int updateRecord(MsgPushPo msgPushPo);
 }

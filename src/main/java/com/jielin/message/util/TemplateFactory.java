@@ -95,7 +95,7 @@ public class TemplateFactory {
             templateMsg.setUrl(template.getJumpAddress());
         }
         for (Map.Entry<String, String> entry : template.getParamMap().entrySet()) {
-            String value = (String) paramDto.getParams().get(entry.getValue());
+            String value = String.valueOf(paramDto.getParams().get(entry.getValue()));
             templateMsg.add(entry.getKey(), value, COLOR);
         }
         if (StringUtils.isNotBlank(template.getRemark())) {
@@ -120,7 +120,7 @@ public class TemplateFactory {
             templateMsg.setPage(template.getJumpAddress());
         }
         for (Map.Entry<String, String> entry : template.getParamMap().entrySet()) {
-            String value = (String) paramDto.getParams().get(entry.getValue());
+            String value = String.valueOf(paramDto.getParams().get(entry.getValue()));
             templateMsg.add(entry.getKey(), value);
         }
         return templateMsg.toJsonStr();
