@@ -24,12 +24,6 @@ public class AsynPushMsgService {
     @Autowired
     private Gson gson;
 
-    //本系统需要投递的数据，直接通过对象投递
-    @RabbitHandler
-    public void process(ParamDto paramDto) {
-        //synMsgPushService.push(paramDto);
-        log.info("Receiver  : {}", paramDto.toString());
-    }
 
     //所有其他系统投递的数据都为字符转
     @RabbitHandler
