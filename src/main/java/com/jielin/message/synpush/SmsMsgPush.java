@@ -45,6 +45,9 @@ public class SmsMsgPush extends MsgPush {
 
         List<String> paramKeys = template.getParamKeys();
         List<String> params = new ArrayList<>();
+        if (paramKeys.isEmpty()){
+            return false;
+        }
         for (String key : paramKeys) {
             params.add((String) paramDto.getParams().get(key));
         }

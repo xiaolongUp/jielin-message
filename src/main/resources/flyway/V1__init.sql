@@ -78,3 +78,9 @@ CREATE TABLE `jl_msg_uniapp` (
   `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+--插入的推送类型的数据，push_type为固定值，对应数据的枚举，如果修改同时修改枚举的数据
+INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (1, '短信推送', 1, 1);
+INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (2, '微信公众号推送', 2, 1);
+INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (3, 'app推送', 3, 1);
+INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (4, '微信小程序推送', 4, 1);
