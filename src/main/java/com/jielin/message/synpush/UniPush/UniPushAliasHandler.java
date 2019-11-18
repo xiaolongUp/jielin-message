@@ -9,6 +9,7 @@ import com.jielin.message.po.GtAliasPo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -21,6 +22,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
+@Transactional
 public class UniPushAliasHandler {
 
     @Autowired
@@ -48,20 +50,24 @@ public class UniPushAliasHandler {
         if (!Optional.ofNullable(pushClient).isPresent()) {
             return false;
         }
+        gtAliasPo.setAlias(gtAliasPo.getPhone());
         UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(gtAliasPo.getAppType());
         if (!Optional.ofNullable(uniPush).isPresent()) {
             return false;
         }
         String appId = uniPush.getAppId();
         IAliasResult ret = pushClient.bindAlias(appId, gtAliasPo.getAlias(), gtAliasPo.getCid());
-        List<GtAliasPo> gtAliasPos = gtAliasDao.selectByCid(gtAliasPo.getCid());
-        if (gtAliasPos.size() == 0) {
-            //别名形式为app类型+phone
-            gtAliasPo.setAlias(gtAliasPo.getAppType() + gtAliasPo.getPhone());
-            gtAliasDao.insert(gtAliasPo);
-        }
         log.info("绑定结果：" + ret.getResponse().toString());
-        return ret.getResponse().get("result").equals("ok");
+        Boolean result =  ret.getResponse().get("result").equals("ok");
+        if (result){
+            List<GtAliasPo> gtAliasPos = gtAliasDao.selectByCid(gtAliasPo.getCid());
+            if (gtAliasPos.size() == 0) {
+                //别名形式为app类型+phone
+                gtAliasPo.setAlias(gtAliasPo.getAppType() + gtAliasPo.getPhone());
+                gtAliasDao.insert(gtAliasPo);
+            }
+        }
+        return result;
     }
 /*
 

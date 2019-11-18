@@ -17,19 +17,23 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JielinMessageApplication.class })
 @ActiveProfiles("test")
 public class JielinMessageApplicationTests {
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -51,13 +55,14 @@ public class JielinMessageApplicationTests {
     @Test
     public void send() {
         Map<String,Object> params = new HashMap<>();
-        params.put("customName","yxl");
+        params.put("orderNo","1234567");
+        params.put("orderType","清洁");
         params.put("productName","日常清洁");
-        params.put("money","100.0");
         params.put("serviceTime","2019-10-15 17:00:00");
+        params.put("customAddress","智慧园商务大楼七楼");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(101)
-                .setPhoneNumber("18530076638")
+                .setPhoneNumber("17621158024")
                 .setPlatform(0)
                 .setAppType("provider")
                 .setParams(params);

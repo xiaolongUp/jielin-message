@@ -1,32 +1,32 @@
 package com.jielin.message.synpush;
 
+import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
 import com.jielin.message.dao.mongo.OperateLogDao;
-import com.jielin.message.dao.mysql.AuthMemberDao;
-import com.jielin.message.dao.mysql.CustomUserDao;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
 import com.jielin.message.po.AuthMemberPo;
 import com.jielin.message.po.OperateLog;
+import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
 import com.jielin.message.util.wechat.WechatTokenHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.HashMap;
 
 import static com.jielin.message.util.MsgConstant.PLATFORM_WECHAT_MP;
+import static com.jielin.message.util.MsgConstant.YUEJIE_WECHAT_MP;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_MP_PUSH;
 
 /**
@@ -42,12 +42,6 @@ public class WxMpMsgPush extends MsgPush {
     private RestTemplate restTemplate;
 
     @Autowired
-    private AuthMemberDao authMemberDao;
-
-    @Autowired
-    private CustomUserDao customUserDao;
-
-    @Autowired
     protected OperateLogDao operateLogDao;
 
     @Autowired
@@ -59,6 +53,9 @@ public class WxMpMsgPush extends MsgPush {
     @Autowired
     private TemplateFactory templateFactory;
 
+    @Autowired
+    private ThirdApiConfig thirdApiConfig;
+
     private static HttpHeaders headers = new HttpHeaders();
 
     @PostConstruct
@@ -69,11 +66,47 @@ public class WxMpMsgPush extends MsgPush {
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
         boolean result = false;
-        Integer customId = customUserDao.selectUserIdByPhone(paramDto.getPhoneNumber());
-        List<AuthMemberPo> authMembers = authMemberDao.selectByCustomId(customId, PLATFORM_WECHAT_MP);
-        if (!authMembers.isEmpty()) {
+        String platform;
+        //悦姐小程序
+        String url;
+        if (paramDto.getAppType().equals("provider")) {
+            platform = YUEJIE_WECHAT_MP;
+            url = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_SERVICE_USER.getActionName();
+        }
+        //用户小程序
+        else {
+            platform = PLATFORM_WECHAT_MP;
+            url = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_CUSTOM_USER.getActionName();
+        }
+
+        String userBuilder = new URIBuilder(url).addParameter("phone", paramDto.getPhoneNumber()).build().toString();
+        ResponseEntity<ResponsePackDto> thirdResult
+                = restTemplate.exchange(userBuilder, ThirdActionEnum.JL_WEB_CUSTOM_USER.getRequestType(), null, ResponsePackDto.class);
+        HashMap user = null;
+        if (thirdResult.getStatusCode().equals(HttpStatus.OK) &&
+                thirdResult.getBody().getBody() != null) {
+            user = (HashMap) thirdResult.getBody().getBody();
+        }
+        if (user == null || user.isEmpty()) {
+            log.error("调用远程接口获取用户信息异常");
+            return false;
+        }
+
+        String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
+        String authBuilder = new URIBuilder(authUrl)
+                .addParameter("customId", user.get("id").toString())
+                .addParameter("platform", platform)
+                .build().toString();
+        ResponseEntity<ResponsePackDto> authResult
+                = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
+        AuthMemberPo authMemberPo = null;
+        if (authResult.getStatusCode().equals(HttpStatus.OK) &&
+                authResult.getBody().getBody() != null) {
+            authMemberPo = (AuthMemberPo) authResult.getBody().getBody();
+        }
+        if (null != authMemberPo) {
             //获取发送的模版数据
-            String data = templateFactory.newTemplate(paramDto, WX_MP_PUSH.getType(), authMembers.get(0).getOpenid());
+            String data = templateFactory.newTemplate(paramDto, WX_MP_PUSH.getType(), authMemberPo.getOpenid());
             if (StringUtils.isBlank(data)) {
                 return false;
             }

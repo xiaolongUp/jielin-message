@@ -25,10 +25,14 @@ public class MsgConstant {
     //rabbitMq的消息推送队列名称
     public static final String PUSH_MSG = "push_msg";
 
-    //平台类型（小程序）
+    //用户小程序平台类型（小程序）
     public static final String PLATFORM_WECHAT_MP = "wechat_mp";
 
     //平台类型（公众号）
     public static final String PLATFORM_WECHAT_OA = "wechat_oa";
+
+    //悦姐小程序
+    public static final String YUEJIE_WECHAT_MP = "yj_wechat_mp";
+
 
 }

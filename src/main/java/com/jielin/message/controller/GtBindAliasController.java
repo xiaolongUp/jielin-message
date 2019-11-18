@@ -3,10 +3,15 @@ package com.jielin.message.controller;
 import com.jielin.message.dto.ResponseDto;
 import com.jielin.message.po.GtAliasPo;
 import com.jielin.message.synpush.UniPush.UniPushAliasHandler;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * 个推绑定用户的别名信息
@@ -46,5 +51,12 @@ public class GtBindAliasController {
         }
     }
 
+
+    //查看是否绑定了别名
+    @GetMapping("/hasAlias")
+    public Boolean BindAlias(@RequestParam("cid") String cid) {
+        ResponseDto<Object> dto = hasBindAlias(cid);
+        return dto.getCode() == 0;
+    }
 
 }

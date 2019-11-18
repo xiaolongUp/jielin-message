@@ -78,7 +78,7 @@ public class SynMsgPushService {
             if (msgPushes.size() == 1
                     && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
                 try {
-                    result = smsMsgPush.pushMsg(paramDto);
+                   // result = smsMsgPush.pushMsg(paramDto);
                 } catch (Exception e) {
                     //do nothing
                 }

@@ -80,6 +80,9 @@ public class UniPushHandler implements AppMsgPushHandler {
             log.info("生成的空模版：{}", appTemplate);
             return false;
         }
+        if(StringUtils.isBlank(tmp.getTitle())){
+            return false;
+        }
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
                 appTemplate, appId, appKey);
         if (!Optional.ofNullable(template).isPresent()) {
