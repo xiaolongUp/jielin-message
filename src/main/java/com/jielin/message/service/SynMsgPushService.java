@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
 
@@ -50,20 +51,15 @@ public class SynMsgPushService {
                 .andPushAllEqualTo(true);
         List<OperatePo> operatePos = operateDao.selectByExample(criteria);
         //所有的推送方式都去推送该消息
-        if (!operatePos.isEmpty()){
-            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(), paramDto.getPlatform());
-            for (MsgPushPo msgPushPo : msgPushes) {
-                String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
-                if (StringUtils.isNoneBlank(pushHandler)) {
-                    MsgPush push = msgPushMap.get(pushHandler);
-                    try {
-                        result = push.pushMsg(paramDto);
-                    } catch (Exception e) {
-                        //do nothing
-                    }
+        if (!operatePos.isEmpty()) {
+            for (Map.Entry<String, MsgPush> msgPush : msgPushMap.entrySet()) {
+                try {
+                    result = msgPush.getValue().pushMsg(paramDto);
+                } catch (Exception e) {
+                    //do nothing
                 }
             }
-        }else {
+        } else {
             //获取需要推送消息的
             List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(), paramDto.getPlatform());
             //当没有配置推送规则时，默认需要推送一条短信
@@ -78,7 +74,8 @@ public class SynMsgPushService {
             if (msgPushes.size() == 1
                     && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
                 try {
-                   // result = smsMsgPush.pushMsg(paramDto);
+                    log.info("推送了一条短信：" + paramDto.toString());
+                    // result = smsMsgPush.pushMsg(paramDto);
                 } catch (Exception e) {
                     //do nothing
                 }
@@ -94,9 +91,9 @@ public class SynMsgPushService {
                         //do nothing
                     }
                     //当有规则发送消息成功且发送消息的不为app时，中断
-                    if (result && !(push instanceof SmsMsgPush)) {
+                    /*if (result && !(push instanceof SmsMsgPush)) {
                         break;
-                    }
+                    }*/
                 }
 
             }
