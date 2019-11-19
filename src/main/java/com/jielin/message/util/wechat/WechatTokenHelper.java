@@ -69,6 +69,9 @@ public class WechatTokenHelper {
                 null,
                 new ParameterizedTypeReference<Map<String, Object>>() {
                 }).getBody();
+        assert result != null;
+        log.info(result.toString());
+        assert result.get("errcode") == null;
         String wxToken = (String) result.get(MsgConstant.WX_TOKEN_KEY);
         Integer wxExpiresIn = (Integer) result.get(MsgConstant.WX_EXPIRES_IN);
         weChatConfig.setGzhAccessToken(wxToken);
@@ -97,13 +100,16 @@ public class WechatTokenHelper {
     private String getMpAccessToken() {
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.ACCESS_TOKEN_URL)
                 .queryParam("grant_type", "client_credential")
-                .queryParam("appid", weChatConfig.getMpAppid())
-                .queryParam("secret", weChatConfig.getMpAppsecret()).build();
+                .queryParam("appid", weChatConfig.getYjMpAppid())
+                .queryParam("secret", weChatConfig.getYjMpAppsecret()).build();
         Map<String, Object> result = restTemplate.exchange(builder.toUriString(),
                 HttpMethod.POST,
                 null,
                 new ParameterizedTypeReference<Map<String, Object>>() {
                 }).getBody();
+        assert result != null;
+        log.info(result.toString());
+        assert result.get("errcode") == null;
         String wxToken = (String) result.get(MsgConstant.WX_TOKEN_KEY);
         Integer wxExpiresIn = (Integer) result.get(MsgConstant.WX_EXPIRES_IN);
         weChatConfig.setMpAccessToken(wxToken);

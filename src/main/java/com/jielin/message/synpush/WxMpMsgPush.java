@@ -6,10 +6,10 @@ import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
-import com.jielin.message.po.AuthMemberPo;
 import com.jielin.message.po.OperateLog;
 import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
+import com.jielin.message.util.enums.UserTypeEnum;
 import com.jielin.message.util.wechat.WechatTokenHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +23,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
+
 import java.util.HashMap;
 
 import static com.jielin.message.util.MsgConstant.PLATFORM_WECHAT_MP;
@@ -68,45 +69,36 @@ public class WxMpMsgPush extends MsgPush {
         boolean result = false;
         String platform;
         //悦姐小程序
-        String url;
-        if (paramDto.getAppType().equals("provider")) {
+        if (paramDto.getAppType().equals(UserTypeEnum.PROVIDER.getType())) {
             platform = YUEJIE_WECHAT_MP;
-            url = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_SERVICE_USER.getActionName();
         }
         //用户小程序
         else {
             platform = PLATFORM_WECHAT_MP;
-            url = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_CUSTOM_USER.getActionName();
-        }
-
-        String userBuilder = new URIBuilder(url).addParameter("phone", paramDto.getPhoneNumber()).build().toString();
-        ResponseEntity<ResponsePackDto> thirdResult
-                = restTemplate.exchange(userBuilder, ThirdActionEnum.JL_WEB_CUSTOM_USER.getRequestType(), null, ResponsePackDto.class);
-        HashMap user = null;
-        if (thirdResult.getStatusCode().equals(HttpStatus.OK) &&
-                thirdResult.getBody().getBody() != null) {
-            user = (HashMap) thirdResult.getBody().getBody();
-        }
-        if (user == null || user.isEmpty()) {
-            log.error("调用远程接口获取用户信息异常");
-            return false;
         }
 
         String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
         String authBuilder = new URIBuilder(authUrl)
-                .addParameter("customId", user.get("id").toString())
+                .addParameter("token",thirdApiConfig.getJlWebAccessToken())
+                .addParameter("customId", paramDto.getUserId().toString())
                 .addParameter("platform", platform)
                 .build().toString();
         ResponseEntity<ResponsePackDto> authResult
                 = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
-        AuthMemberPo authMemberPo = null;
+        String openid = null;
         if (authResult.getStatusCode().equals(HttpStatus.OK) &&
-                authResult.getBody().getBody() != null) {
-            authMemberPo = (AuthMemberPo) authResult.getBody().getBody();
+                authResult.getBody() != null) {
+            ResponsePackDto body = authResult.getBody();
+            if (body.getStatus() == 3){
+                thirdApiConfig.init();
+                this.pushMsg(paramDto);
+            }
+            HashMap map = (HashMap) authResult.getBody().getBody();
+            openid = (String) map.get("openid");
         }
-        if (null != authMemberPo) {
+        if (StringUtils.isNotBlank(openid)) {
             //获取发送的模版数据
-            String data = templateFactory.newTemplate(paramDto, WX_MP_PUSH.getType(), authMemberPo.getOpenid());
+            String data = templateFactory.newTemplate(paramDto, WX_MP_PUSH.getType(), openid);
             if (StringUtils.isBlank(data)) {
                 return false;
             }

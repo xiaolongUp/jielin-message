@@ -14,6 +14,9 @@ import java.util.Map;
 @Accessors(chain = true)
 public class ParamDto  {
 
+    //用户id
+    private Integer userId;
+
     //来自哪个平台（悦管家平台，悦所平台等）
     private Integer platform;
 

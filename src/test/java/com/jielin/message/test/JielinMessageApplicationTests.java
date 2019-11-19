@@ -62,6 +62,7 @@ public class JielinMessageApplicationTests {
         params.put("customAddress","智慧园商务大楼七楼");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(101)
+                .setUserId(3475)
                 .setPhoneNumber("17621158024")
                 .setPlatform(0)
                 .setAppType("provider")

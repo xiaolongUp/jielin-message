@@ -1,32 +1,31 @@
 package com.jielin.message.synpush;
 
+import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
 import com.jielin.message.dao.mongo.OperateLogDao;
-import com.jielin.message.dao.mysql.AuthMemberDao;
-import com.jielin.message.dao.mysql.CustomUserDao;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
-import com.jielin.message.po.AuthMemberPo;
 import com.jielin.message.po.OperateLog;
+import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
+import com.jielin.message.util.enums.UserTypeEnum;
 import com.jielin.message.util.wechat.WechatTokenHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.HashMap;
 
-import static com.jielin.message.util.MsgConstant.PLATFORM_WECHAT_OA;
+import static com.jielin.message.util.MsgConstant.*;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_NP_PUSH;
 
 /**
@@ -42,12 +41,6 @@ public class WxMsgPush extends MsgPush {
     private RestTemplate restTemplate;
 
     @Autowired
-    private AuthMemberDao authMemberDao;
-
-    @Autowired
-    private CustomUserDao customUserDao;
-
-    @Autowired
     protected OperateLogDao operateLogDao;
 
     @Autowired
@@ -59,6 +52,9 @@ public class WxMsgPush extends MsgPush {
     @Autowired
     private TemplateFactory templateFactory;
 
+    @Autowired
+    private ThirdApiConfig thirdApiConfig;
+
     private static HttpHeaders headers = new HttpHeaders();
 
     @PostConstruct
@@ -69,11 +65,38 @@ public class WxMsgPush extends MsgPush {
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
         boolean result = false;
-        Integer customId = customUserDao.selectUserIdByPhone(paramDto.getPhoneNumber());
-        List<AuthMemberPo> authMembers = authMemberDao.selectByCustomId(customId, PLATFORM_WECHAT_OA);
-        if (!authMembers.isEmpty()) {
+        String platform;
+        //悦姐小程序
+        if (paramDto.getAppType().equals(UserTypeEnum.PROVIDER.getType())) {
+            platform = YUEJIE_WECHAT_MP;
+        }
+        //用户小程序
+        else {
+            platform = PLATFORM_WECHAT_MP;
+        }
+
+        String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
+        String authBuilder = new URIBuilder(authUrl)
+                .addParameter("token",thirdApiConfig.getJlWebAccessToken())
+                .addParameter("customId", paramDto.getUserId().toString())
+                .addParameter("platform", platform)
+                .build().toString();
+        ResponseEntity<ResponsePackDto> authResult
+                = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
+        String openid = null;
+        if (authResult.getStatusCode().equals(HttpStatus.OK) &&
+                authResult.getBody() != null) {
+            ResponsePackDto body = authResult.getBody();
+            if (body.getStatus() == 3){
+                thirdApiConfig.init();
+                this.pushMsg(paramDto);
+            }
+            HashMap map = (HashMap) authResult.getBody().getBody();
+            openid = (String) map.get("openid");
+        }
+        if (StringUtils.isNotBlank(openid)) {
             //获取发送的模版数据
-            String data = templateFactory.newTemplate(paramDto, WX_NP_PUSH.getType(), authMembers.get(0).getOpenid());
+            String data = templateFactory.newTemplate(paramDto, WX_NP_PUSH.getType(), openid);
             if (StringUtils.isBlank(data)) {
                 return false;
             }

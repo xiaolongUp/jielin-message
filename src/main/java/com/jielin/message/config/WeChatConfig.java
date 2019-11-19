@@ -21,10 +21,10 @@ public class WeChatConfig {
 
     private String gzhAppsecret;
 
-    //小程序的appid和secret
-    private String mpAppid;
+    //悦姐小程序的appid和secret
+    private String yjMpAppid;
 
-    private String mpAppsecret;
+    private String yjMpAppsecret;
 
     //公众号接口accessToken
     private String gzhAccessToken;

@@ -8,9 +8,9 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriBuilder;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -43,7 +43,8 @@ public class ThirdApiConfig {
         params.put("cid", "");
         ResponseEntity<ResponsePackDto> result
                 = restTemplate.exchange(url, ThirdActionEnum.JL_WEB_ACCESS_TOKEN.getRequestType(), HttpEntityUtil.getHttpEntity(params), ResponsePackDto.class);
-        if (result.getStatusCode().equals(0)) {
+        if (result.getStatusCode().equals(HttpStatus.OK) &&
+                null != result.getBody()) {
             HashMap map = (HashMap) result.getBody().getBody();
             this.jlWebAccessToken = (String) map.get("accessToken");
         }
