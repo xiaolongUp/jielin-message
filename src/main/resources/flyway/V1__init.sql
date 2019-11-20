@@ -84,3 +84,6 @@ INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (1,
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (2, '微信公众号推送', 2, 1);
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (3, 'app推送', 3, 1);
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (4, '微信小程序推送', 4, 1);
+
+--悦姐uniapp的参数
+INSERT INTO `jl_msg_uniapp`(`id`, `app_type`, `app_id`, `app_secret`, `app_key`, `master_secret`, `enable`, `create_time`, `update_time`) VALUES (1, 'provider', '2koe01I7T19y6AqSWBLcs4', 'Zxgm8qB0xxAebPfvWWYgS8', 'Ih4SdZhHkX9fJxlPpNmQr6', 'Ugg92J4n6b9xLrrbtshtt4', 1, '2019-11-20 09:51:59', '2019-11-20 09:53:44');
