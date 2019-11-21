@@ -34,5 +34,13 @@ public class MsgConstant {
     //悦姐小程序
     public static final String YUEJIE_WECHAT_MP = "yj_wechat_mp";
 
+    //测试环境
+    public static final String TEST_PROFILE = "test";
+
+    //开发环境
+    public static final String DEV_PROFILE = "dev";
+
+    //生产环境
+    public static final String PROD_PROFILE = "prod";
 
 }

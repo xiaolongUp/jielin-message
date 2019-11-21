@@ -108,8 +108,6 @@ public class WxMpMsgPush extends MsgPush {
                     HttpMethod.POST,
                     new HttpEntity<>(data, headers),
                     TemplateMsgResult.class).getBody();
-            //当access_token无效时刷新缓存数据
-            log.info("微信小程序推送结果：{}", templateMsgResult.toString());
             if (templateMsgResult.getErrcode() == 40001) {
                 UriComponents retry = UriComponentsBuilder.fromHttpUrl(WeChatConfig.MP_PUSH_TEMPLATE_MSG_URL)
                         .queryParam("access_token", wechatTokenHelper.getMpToken(false)).build();
@@ -120,6 +118,8 @@ public class WxMpMsgPush extends MsgPush {
             } else if (templateMsgResult.getErrcode() != 0) {
                 operateLogDao.insert(new OperateLog(templateMsgResult));
             }
+            //当access_token无效时刷新缓存数据
+            log.info("微信小程序推送结果：{}", templateMsgResult.toString());
             result = templateMsgResult.getErrcode() == 0;
         }
         return result;
