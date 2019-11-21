@@ -27,7 +27,7 @@ public abstract class MsgPush {
     //三次重试都失败后的处理方法
     @Recover
     public boolean recover(Exception e) {
-        log.error("MsgPush发送消息失败：{}", e.getMessage());
+        log.error("MsgPush发送消息失败：", e);
         operateLogDao.insert(new OperateLog(e.getMessage()));
         return false;
     }
