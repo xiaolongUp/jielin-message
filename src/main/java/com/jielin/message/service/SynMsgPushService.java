@@ -75,7 +75,7 @@ public class SynMsgPushService {
                     && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
                 try {
                     log.info("推送了一条短信：" + paramDto.toString());
-                    // result = smsMsgPush.pushMsg(paramDto);
+                    result = smsMsgPush.pushMsg(paramDto);
                 } catch (Exception e) {
                     //do nothing
                 }

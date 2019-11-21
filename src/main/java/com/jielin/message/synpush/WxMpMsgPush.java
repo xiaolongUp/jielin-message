@@ -86,15 +86,15 @@ public class WxMpMsgPush extends MsgPush {
         ResponseEntity<ResponsePackDto> authResult
                 = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
         String openid = null;
-        if (authResult.getStatusCode().equals(HttpStatus.OK) &&
-                authResult.getBody() != null) {
-            ResponsePackDto body = authResult.getBody();
-            if (body.getStatus() == 3){
-                thirdApiConfig.init();
-                this.pushMsg(paramDto);
+        if (null != authResult.getBody() && authResult.getBody().getStatus() == 3){
+            thirdApiConfig.init();
+            this.pushMsg(paramDto);
+        }else if (authResult.getStatusCode().equals(HttpStatus.OK) &&
+                null != authResult.getBody()) {
+            if (null != authResult.getBody().getBody()){
+                HashMap map = (HashMap) authResult.getBody().getBody();
+                openid = (String) map.get("openid");
             }
-            HashMap map = (HashMap) authResult.getBody().getBody();
-            openid = (String) map.get("openid");
         }
         if (StringUtils.isNotBlank(openid)) {
             //获取发送的模版数据

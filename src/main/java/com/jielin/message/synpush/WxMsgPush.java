@@ -65,34 +65,25 @@ public class WxMsgPush extends MsgPush {
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
         boolean result = false;
-        String platform;
-        //悦姐小程序
-        if (paramDto.getAppType().equals(UserTypeEnum.PROVIDER.getType())) {
-            platform = YUEJIE_WECHAT_MP;
-        }
-        //用户小程序
-        else {
-            platform = PLATFORM_WECHAT_MP;
-        }
 
         String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
         String authBuilder = new URIBuilder(authUrl)
                 .addParameter("token",thirdApiConfig.getJlWebAccessToken())
                 .addParameter("customId", paramDto.getUserId().toString())
-                .addParameter("platform", platform)
+                .addParameter("platform", PLATFORM_WECHAT_OA)
                 .build().toString();
         ResponseEntity<ResponsePackDto> authResult
                 = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
         String openid = null;
-        if (authResult.getStatusCode().equals(HttpStatus.OK) &&
-                authResult.getBody() != null) {
-            ResponsePackDto body = authResult.getBody();
-            if (body.getStatus() == 3){
-                thirdApiConfig.init();
-                this.pushMsg(paramDto);
+        if (null != authResult.getBody() && authResult.getBody().getStatus() == 3){
+            thirdApiConfig.init();
+            this.pushMsg(paramDto);
+        }else if (authResult.getStatusCode().equals(HttpStatus.OK) &&
+                null != authResult.getBody()) {
+            if (null != authResult.getBody().getBody()){
+                HashMap map = (HashMap) authResult.getBody().getBody();
+                openid = (String) map.get("openid");
             }
-            HashMap map = (HashMap) authResult.getBody().getBody();
-            openid = (String) map.get("openid");
         }
         if (StringUtils.isNotBlank(openid)) {
             //获取发送的模版数据

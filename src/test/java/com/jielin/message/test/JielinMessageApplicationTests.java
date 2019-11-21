@@ -55,15 +55,16 @@ public class JielinMessageApplicationTests {
     @Test
     public void send() {
         Map<String,Object> params = new HashMap<>();
-        params.put("orderNo","1234567");
-        params.put("orderType","清洁");
-        params.put("productName","日常清洁");
-        params.put("serviceTime","2019-10-15 17:00:00");
-        params.put("customAddress","智慧园商务大楼七楼");
+        params.put("orderNo","DD1911211023053484");
+        params.put("productName","单次清洁");
+        params.put("serviceTime","11月21日14:30");
+        params.put("customAddress","智慧园商务大楼709");
+        params.put("orderType","单次清洁 [1人2小时x1]");
+        params.put("customPhone","18530076638");
         ParamDto paramDto = new ParamDto();
-        paramDto.setOperateType(101)
-                .setUserId(3475)
-                .setPhoneNumber("17621158024")
+        paramDto.setOperateType(102)
+                .setUserId(6587)
+                .setPhoneNumber("18530076638")
                 .setPlatform(0)
                 .setAppType("provider")
                 .setParams(params);
@@ -77,8 +78,8 @@ public class JielinMessageApplicationTests {
     /**
      *  插入模版数据
      */
-    @Test
-    public void insert() {
+    //@Test
+    /*public void insert() {
         Template template = new Template();
         Map<String, String> params = new HashMap<>();
         params.put("keyword1", "customName");
@@ -95,6 +96,6 @@ public class JielinMessageApplicationTests {
                 .setUpdateTime(new Date())
                 .setEnable(true);
         templateDao.insert(template);
-    }
+    }*/
 
 }
