@@ -22,7 +22,7 @@ public class AccessWhiteListConfig {
 
     //查看调用该接口的ip是否有权限调用
     public final boolean canAccess(String remoteIp) {
-        /*if (StringUtils.isBlank(remoteIp)) {
+        if (StringUtils.isBlank(remoteIp)) {
             return false;
         }
         for (String ip : this.access) {
@@ -30,7 +30,6 @@ public class AccessWhiteListConfig {
                 return true;
             }
         }
-        return false;*/
-        return true;
+        return false;
     }
 }
