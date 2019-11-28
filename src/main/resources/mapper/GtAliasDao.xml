@@ -37,5 +37,6 @@
     <select id="selectAliasByPhone" resultType="java.lang.String">
         select alias from jl_gt_alias
         where app_type = #{appType} and phone = #{phone}
+        LIMIT 1
     </select>
 </mapper>
