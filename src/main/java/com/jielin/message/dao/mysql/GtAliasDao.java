@@ -3,6 +3,7 @@ package com.jielin.message.dao.mysql;
 import com.jielin.message.po.GtAliasPo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
@@ -20,8 +21,16 @@ public interface GtAliasDao {
      */
     int insert(GtAliasPo record);
 
-    List<GtAliasPo> selectByCid(@Param("cid") String cid);
+    List<GtAliasPo> selectByCid(@Param("cid") String cid,
+                                @Param("phone") String phone,
+                                @Param("appType") String appType);
+
+    List<GtAliasPo> selectByCidAndAppType(@Param("cid") String cid,
+                                          @Param("appType") String appType);
 
     @Cacheable(key = "#root.methodName+':'+#appType+':'+#phone")
     String selectAliasByPhone(@Param("appType") String appType, @Param("phone") String phone);
+
+    @CacheEvict(allEntries = true)
+    void deleteByIds(@Param("ids") List<Integer> ids);
 }

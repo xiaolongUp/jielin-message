@@ -41,8 +41,10 @@ public class GtBindAliasController {
 
     //查看是否绑定了别名
     @GetMapping("/alias")
-    public ResponseDto<Object> hasBindAlias(@RequestParam("cid") String cid) {
-        List<GtAliasPo> gtAliasPos = uniPushAliasHandler.hasBindAlias(cid);
+    public ResponseDto<Object> hasBindAlias(@RequestParam("cid") String cid,
+                                            @RequestParam("phone") String phone,
+                                            @RequestParam("appType") String appType) {
+        List<GtAliasPo> gtAliasPos = uniPushAliasHandler.hasBindAlias(cid, phone, appType);
 
         if (gtAliasPos.size() > 0) {
             return new ResponseDto<>();
@@ -54,8 +56,10 @@ public class GtBindAliasController {
 
     //查看是否绑定了别名
     @GetMapping("/hasAlias")
-    public Boolean BindAlias(@RequestParam("cid") String cid) {
-        ResponseDto<Object> dto = hasBindAlias(cid);
+    public Boolean BindAlias(@RequestParam("cid") String cid,
+                             @RequestParam("phone") String phone,
+                             @RequestParam("appType") String appType) {
+        ResponseDto<Object> dto = hasBindAlias(cid, phone, appType);
         return dto.getCode() == 0;
     }
 

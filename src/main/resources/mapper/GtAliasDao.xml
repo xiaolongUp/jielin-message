@@ -28,15 +28,31 @@
           This element was generated on Tue Oct 08 17:19:36 CST 2019.
         -->
         insert into jl_gt_alias (id, cid, alias, app_type, phone)
-        values (#{id,jdbcType=INTEGER}, #{cid,jdbcType=VARCHAR}, #{alias,jdbcType=VARCHAR}, #{appType,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR})
+        values (#{id,jdbcType=INTEGER}, #{cid,jdbcType=VARCHAR}, #{alias,jdbcType=VARCHAR}, #{appType,jdbcType=VARCHAR},
+        #{phone,jdbcType=VARCHAR})
     </insert>
     <select id="selectByCid" parameterType="string" resultType="com.jielin.message.po.GtAliasPo">
-        select <include refid="Base_Column_List"/> from jl_gt_alias
-        where cid = #{cid}
+        select
+        <include refid="Base_Column_List"/>
+        from jl_gt_alias
+        where cid = #{cid} and app_type = #{appType} and phone = #{phone}
+    </select>
+    <select id="selectByCidAndAppType" parameterType="string" resultType="com.jielin.message.po.GtAliasPo">
+        select
+        <include refid="Base_Column_List"/>
+        from jl_gt_alias
+        where cid = #{cid} and app_type = #{appType}
     </select>
     <select id="selectAliasByPhone" resultType="java.lang.String">
         select alias from jl_gt_alias
         where app_type = #{appType} and phone = #{phone}
         LIMIT 1
     </select>
+    <!--批量删除用户-->
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from jl_gt_alias where id IN
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

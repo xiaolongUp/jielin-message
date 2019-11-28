@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -58,10 +59,13 @@ public class UniPushAliasHandler {
         String appId = uniPush.getAppId();
         IAliasResult ret = pushClient.bindAlias(appId, gtAliasPo.getAlias(), gtAliasPo.getCid());
         log.info("绑定结果：" + ret.getResponse().toString());
-        Boolean result =  ret.getResponse().get("result").equals("ok");
-        if (result){
-            List<GtAliasPo> gtAliasPos = gtAliasDao.selectByCid(gtAliasPo.getCid());
+        Boolean result = ret.getResponse().get("result").equals("ok");
+        if (result) {
+            List<GtAliasPo> gtAliasPos = gtAliasDao.selectByCid(gtAliasPo.getCid(), gtAliasPo.getPhone(), gtAliasPo.getAppType());
             if (gtAliasPos.size() == 0) {
+                //当此手机cid绑定过其他用户时，解绑
+                List<GtAliasPo> hasBind = gtAliasDao.selectByCidAndAppType(gtAliasPo.getCid(), gtAliasPo.getAppType());
+                gtAliasDao.deleteByIds(hasBind.stream().map(GtAliasPo::getId).collect(Collectors.toList()));
                 //别名形式为app类型+phone
                 gtAliasPo.setAlias(gtAliasPo.getPhone());
                 gtAliasDao.insert(gtAliasPo);
@@ -120,8 +124,8 @@ public class UniPushAliasHandler {
      * @param cid 个推cid
      * @return 数据库是否存在该设备的绑定关系
      */
-    public List<GtAliasPo> hasBindAlias(String cid) {
-        return gtAliasDao.selectByCid(cid);
+    public List<GtAliasPo> hasBindAlias(String cid, String phone, String appType) {
+        return gtAliasDao.selectByCid(cid, phone, appType);
     }
 
 }
