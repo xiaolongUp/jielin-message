@@ -11,6 +11,7 @@ import com.gexin.rp.sdk.http.IGtPush;
 import com.gexin.rp.sdk.template.NotificationTemplate;
 import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.gexin.rp.sdk.template.style.Style0;
+import com.google.gson.Gson;
 import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.config.UniPushConfig;
 import com.jielin.message.dao.mongo.TemplateDao;
@@ -47,6 +48,9 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Autowired
     private TemplateFactory templateFactory;
 
+    @Autowired
+    private Gson gson;
+
     private Map<String, IGtPush> IGtPushMap = new HashMap<>();
 
 
@@ -80,7 +84,7 @@ public class UniPushHandler implements AppMsgPushHandler {
             log.info("生成的空模版：{}", appTemplate);
             return false;
         }
-        if(StringUtils.isBlank(tmp.getTitle())){
+        if (StringUtils.isBlank(tmp.getTitle())) {
             return false;
         }
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
@@ -103,7 +107,7 @@ public class UniPushHandler implements AppMsgPushHandler {
             return false;
         }
         PushResult result = (PushResult) pushClient.pushMessageToApp(message);
-        log.info("app推送结果:{}",result.getResponse().toString());
+        log.info("app推送结果:{}", result.getResponse().toString());
         //当result为RepeatedContent时，个推不允许15分钟重复发送数据
         return result.getResponse().get("result").equals("ok");
     }
@@ -150,7 +154,7 @@ public class UniPushHandler implements AppMsgPushHandler {
             return false;
         }
         IPushResult result = pushClient.pushMessageToSingle(message, target);
-        log.info("app推送结果:{}",result.getResponse().toString());
+        log.info("app推送结果:{}", result.getResponse().toString());
         return result.getResponse().get("result").equals("ok");
 
     }
@@ -187,6 +191,10 @@ public class UniPushHandler implements AppMsgPushHandler {
         Notify notify = new Notify();
         notify.setTitle(title);
         notify.setContent(content);
+        Map<String, String> map = new HashMap<>();
+        map.put("title", title);
+        map.put("content", content);
+        notify.setPayload(gson.toJson(map));
         String intent = "intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=%s;S.content=%s;S.payload=test;end";
         notify.setIntent(String.format(intent, title, content));
         notify.setType(GtReq.NotifyInfo.Type._intent);
