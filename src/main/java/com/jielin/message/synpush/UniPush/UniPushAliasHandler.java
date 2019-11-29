@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -65,7 +66,9 @@ public class UniPushAliasHandler {
             if (gtAliasPos.size() == 0) {
                 //当此手机cid绑定过其他用户时，解绑
                 List<GtAliasPo> hasBind = gtAliasDao.selectByCidAndAppType(gtAliasPo.getCid(), gtAliasPo.getAppType());
-                gtAliasDao.deleteByIds(hasBind.stream().map(GtAliasPo::getId).collect(Collectors.toList()));
+                if (!CollectionUtils.isEmpty(hasBind)){
+                    gtAliasDao.deleteByIds(hasBind.stream().map(GtAliasPo::getId).collect(Collectors.toList()));
+                }
                 //别名形式为app类型+phone
                 gtAliasPo.setAlias(gtAliasPo.getPhone());
                 gtAliasDao.insert(gtAliasPo);
