@@ -199,6 +199,7 @@ public class UniPushHandler implements AppMsgPushHandler {
         notify.setIntent(String.format(intent, title, content));
         notify.setType(GtReq.NotifyInfo.Type._intent);
         template.set3rdNotifyInfo(notify);//设置第三方通知
+        log.info("推送给app的消息为:{}", notify.toString());
         return template;
     }
 
