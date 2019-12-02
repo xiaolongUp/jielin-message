@@ -6,6 +6,8 @@ import com.jielin.message.JielinMessageApplication;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.Template;
+import com.jielin.message.service.SynMsgPushService;
+import com.jielin.message.synpush.UniPush.UniPushHandler;
 import com.jielin.message.util.MsgConstant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +37,9 @@ public class JielinMessageApplicationTests {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private UniPushHandler uniPushHandler;
+
     @Bean
     public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(MockConnectionFactoryFactory.build());
@@ -49,21 +54,31 @@ public class JielinMessageApplicationTests {
     @Autowired
     private Gson gson;
 
+    @Autowired
+    private SynMsgPushService synMsgPushService;
+
     /**
      * 发送rabbitMq的消息
      */
     @Test
     public void send() {
+/*
+        {"userId":1652,"platform":0,"operateType":102,"phoneNumber"
+            :"18456071819","appType":"provider","params":{"orderType":
+            "周期清洁:周期清洁 [1人3小时x1]","orderNo":"DD1911281417453483",
+                    "customPhone":"18456071819","serviceT日16:00",
+                    "productName":"周期清洁","customAddress":"智慧园商务大楼"}}*/
+
         Map<String,Object> params = new HashMap<>();
-        params.put("orderNo","DD1911211023053484");
-        params.put("productName","单次清洁");
+        params.put("orderNo","DD1911281417453483");
+        params.put("productName","周期清洁123");
         params.put("serviceTime","11月21日14:30");
-        params.put("customAddress","智慧园商务大楼709");
-        params.put("orderType","单次清洁 [1人2小时x1]");
+        params.put("customAddress","智慧园商务大楼131312312");
+        params.put("orderType","周期清洁:周期清洁 [1人3小时x1]");
         params.put("customPhone","18530076638");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(102)
-                .setUserId(6587)
+                .setUserId(1652)
                 .setPhoneNumber("18530076638")
                 .setPlatform(0)
                 .setAppType("provider")
@@ -72,7 +87,8 @@ public class JielinMessageApplicationTests {
 
         String context = "hello " + new Date();
         System.out.println("Sender : " + context);
-        this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
+        synMsgPushService.push(paramDto);
+        //this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
     }
 
     /**
@@ -97,5 +113,24 @@ public class JielinMessageApplicationTests {
                 .setEnable(true);
         templateDao.insert(template);
     }*/
+
+    @Test
+    public void sendToUniApp() throws Exception {
+
+        ParamDto dto = new ParamDto();
+        Map<String,Object> map = new HashMap<>();
+        map.put("orderNo","DD1911211725366192");
+        map.put("serviceName","杨晓龙123");
+        map.put("serviceTime","11月22日");
+        dto.setPlatform(0)
+                .setUserId(6587)
+                .setPlatform(0)
+                .setOperateType(113)
+                .setPhoneNumber("15546049601")
+                .setAppType("provider")
+                .setParams(map);
+        uniPushHandler.sendPushAll(dto);
+    }
+
 
 }
