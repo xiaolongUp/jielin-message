@@ -1,11 +1,14 @@
 package com.jielin.message.synpush.UniPush;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gexin.rp.sdk.base.IPushResult;
 import com.gexin.rp.sdk.base.impl.AppMessage;
 import com.gexin.rp.sdk.base.impl.PushResult;
 import com.gexin.rp.sdk.base.impl.SingleMessage;
 import com.gexin.rp.sdk.base.impl.Target;
 import com.gexin.rp.sdk.base.notify.Notify;
+import com.gexin.rp.sdk.base.payload.APNPayload;
 import com.gexin.rp.sdk.dto.GtReq;
 import com.gexin.rp.sdk.http.IGtPush;
 import com.gexin.rp.sdk.template.NotificationTemplate;
@@ -14,9 +17,11 @@ import com.gexin.rp.sdk.template.style.Style0;
 import com.google.gson.Gson;
 import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.config.UniPushConfig;
+import com.jielin.message.dao.mongo.ProviderOrderLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dao.mysql.GtAliasDao;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.po.ProviderOrderLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.synpush.AppMsgPushHandler;
 import com.jielin.message.util.TemplateFactory;
@@ -48,8 +53,10 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Autowired
     private TemplateFactory templateFactory;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
-    private Gson gson;
+    private ProviderOrderLogDao providerOrderLogDao;
 
     private Map<String, IGtPush> IGtPushMap = new HashMap<>();
 
@@ -154,6 +161,10 @@ public class UniPushHandler implements AppMsgPushHandler {
             return false;
         }
         IPushResult result = pushClient.pushMessageToSingle(message, target);
+        ProviderOrderLog logs = new ProviderOrderLog(alias,
+                PushTypeEnum.APP_PUSH.getDesc(),
+                template.getTransmissionContent());
+        providerOrderLogDao.insert(logs);
         log.info("app推送结果:{}", result.getResponse().toString());
         return result.getResponse().get("result").equals("ok");
 
@@ -182,23 +193,32 @@ public class UniPushHandler implements AppMsgPushHandler {
     }
 
     //创建透传消息模版
-    private TransmissionTemplate createTransmissionTemplate(String title, String content, String appId, String appKey) {
+    private TransmissionTemplate createTransmissionTemplate(String title, String content, String appId, String appKey) throws JsonProcessingException {
+        Map<String, String> map = new HashMap<>();
+        map.put("content", content);
+        map.put("title", title);
         TransmissionTemplate template = new TransmissionTemplate();
         template.setAppId(appId);
         template.setAppkey(appKey);
-        template.setTransmissionContent(content);
+        template.setTransmissionContent(objectMapper.writeValueAsString(map));
         template.setTransmissionType(2);
         Notify notify = new Notify();
         notify.setTitle(title);
         notify.setContent(content);
-        Map<String, String> map = new HashMap<>();
-        map.put("title", title);
-        map.put("content", content);
-        notify.setPayload(gson.toJson(map));
+        notify.setPayload(objectMapper.writeValueAsString(map));
         String intent = "intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=%s;S.content=%s;S.payload=test;end";
         notify.setIntent(String.format(intent, title, content));
         notify.setType(GtReq.NotifyInfo.Type._intent);
         template.set3rdNotifyInfo(notify);//设置第三方通知
+        //设置ios推送
+        APNPayload apnPayload = new APNPayload();
+        //推送直接带有透传数据
+        apnPayload.setContentAvailable(1);
+        apnPayload.setSound("default");
+        apnPayload.addCustomMsg("payload", objectMapper.writeValueAsString(map));
+        apnPayload.addCustomMsg("title", title);
+        apnPayload.addCustomMsg("content", content);
+        template.setAPNInfo(apnPayload);
         log.info("推送给app的消息为:{}", notify.toString());
         return template;
     }
