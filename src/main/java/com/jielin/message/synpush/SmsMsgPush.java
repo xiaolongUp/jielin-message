@@ -8,6 +8,7 @@ import com.jielin.message.dto.SmsBean;
 import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -73,7 +74,7 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             }
             SmsBean smsBean = yunTXSmsConfig.sendCommonSMS(paramDto.getPhoneNumber(), smsTemplateId,
                     params.toArray(new String[params.size()]));
-            messageSendLogDao.insert(new MessageSendLog(paramDto, smsBean.getMessage()));
+            messageSendLogDao.insert(new MessageSendLog(paramDto, SMS_PUSH.getDesc(), smsBean.getMessage()));
             return smsBean.getIsSuccess();
         } else {
             log.info("测试环境和本地环境的短信发送：{}", paramDto.toString());

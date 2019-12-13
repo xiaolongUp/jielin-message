@@ -36,16 +36,20 @@ public class MessageSendLog implements Serializable {
     //操作类型
     private String operateType;
 
+    //推送类型
+    private String pushType;
+
     //params
     private String params;
 
     //推送结果
     private String result;
 
-    public MessageSendLog(ParamDto paramDto, String result) {
+    public MessageSendLog(ParamDto paramDto,String pushType, String result) {
         this.userId = paramDto.getUserId();
         this.phone = paramDto.getPhoneNumber();
         this.operateType = OperateTypeEnum.getDescByType(paramDto.getOperateType());
+        this.pushType = pushType;
         this.params = paramDto.toString();
         this.result = result;
     }

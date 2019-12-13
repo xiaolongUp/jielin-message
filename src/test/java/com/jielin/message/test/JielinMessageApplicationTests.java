@@ -87,8 +87,8 @@ public class JielinMessageApplicationTests {
 
         String context = "hello " + new Date();
         System.out.println("Sender : " + context);
-        //synMsgPushService.push(paramDto);
-        this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
+        synMsgPushService.push(paramDto);
+        //this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
     }
 
     /**

@@ -125,7 +125,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         PushResult result = (PushResult) pushClient.pushMessageToApp(message);
         log.info("app推送结果:{}", result.getResponse().toString());
         //当result为RepeatedContent时，个推不允许15分钟重复发送数据
-        messageSendLogDao.insert(new MessageSendLog(paramDto, gson.toJson(result)));
         return result.getResponse().get("result").equals("ok");
     }
 
@@ -175,6 +174,7 @@ public class UniPushHandler implements AppMsgPushHandler {
                 PushTypeEnum.APP_PUSH.getDesc(),
                 template.getTransmissionContent());
         providerOrderLogDao.insert(logs);
+        messageSendLogDao.insert(new MessageSendLog(paramDto, PushTypeEnum.APP_PUSH.getDesc(), gson.toJson(result)));
         log.info("app推送结果:{}", result.getResponse().toString());
         return result.getResponse().get("result").equals("ok");
 
@@ -229,7 +229,7 @@ public class UniPushHandler implements AppMsgPushHandler {
         apnPayload.addCustomMsg("title", title);
         apnPayload.addCustomMsg("content", content);
         template.setAPNInfo(apnPayload);
-        log.info("推送给app的消息为:{}", notify.toString());
+        //log.info("推送给app的消息为:{}", notify.toString());
         return template;
     }
 

@@ -11,6 +11,7 @@ import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.OperateLog;
 import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
+import com.jielin.message.util.enums.PushTypeEnum;
 import com.jielin.message.util.enums.UserTypeEnum;
 import com.jielin.message.util.wechat.WechatTokenHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +126,7 @@ public class WxMpMsgPush extends MsgPush {
             }
             //当access_token无效时刷新缓存数据
             log.info("微信小程序推送结果：{}", templateMsgResult.toString());
-            messageSendLogDao.insert(new MessageSendLog(paramDto, templateMsgResult.toString()));
+            messageSendLogDao.insert(new MessageSendLog(paramDto, WX_MP_PUSH.getDesc(), templateMsgResult.toString()));
             result = templateMsgResult.getErrcode() == 0;
         }
         return result;
