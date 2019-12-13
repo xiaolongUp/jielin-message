@@ -2,10 +2,12 @@ package com.jielin.message.synpush;
 
 import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
+import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
+import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.OperateLog;
 import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
@@ -57,6 +59,9 @@ public class WxMpMsgPush extends MsgPush {
     @Autowired
     private ThirdApiConfig thirdApiConfig;
 
+    @Autowired
+    private MessageSendLogDao messageSendLogDao;
+
     private static HttpHeaders headers = new HttpHeaders();
 
     @PostConstruct
@@ -79,19 +84,19 @@ public class WxMpMsgPush extends MsgPush {
 
         String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
         String authBuilder = new URIBuilder(authUrl)
-                .addParameter("token",thirdApiConfig.getJlWebAccessToken())
+                .addParameter("token", thirdApiConfig.getJlWebAccessToken())
                 .addParameter("customId", paramDto.getUserId().toString())
                 .addParameter("platform", platform)
                 .build().toString();
         ResponseEntity<ResponsePackDto> authResult
                 = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
         String openid = null;
-        if (null != authResult.getBody() && authResult.getBody().getStatus() == 3){
+        if (null != authResult.getBody() && authResult.getBody().getStatus() == 3) {
             thirdApiConfig.init();
             this.pushMsg(paramDto);
-        }else if (authResult.getStatusCode().equals(HttpStatus.OK) &&
+        } else if (authResult.getStatusCode().equals(HttpStatus.OK) &&
                 null != authResult.getBody()) {
-            if (null != authResult.getBody().getBody()){
+            if (null != authResult.getBody().getBody()) {
                 HashMap map = (HashMap) authResult.getBody().getBody();
                 openid = (String) map.get("openid");
             }
@@ -120,6 +125,7 @@ public class WxMpMsgPush extends MsgPush {
             }
             //当access_token无效时刷新缓存数据
             log.info("微信小程序推送结果：{}", templateMsgResult.toString());
+            messageSendLogDao.insert(new MessageSendLog(paramDto, templateMsgResult.toString()));
             result = templateMsgResult.getErrcode() == 0;
         }
         return result;

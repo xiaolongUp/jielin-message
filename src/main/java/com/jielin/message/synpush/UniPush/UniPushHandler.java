@@ -17,10 +17,13 @@ import com.gexin.rp.sdk.template.style.Style0;
 import com.google.gson.Gson;
 import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.config.UniPushConfig;
+import com.jielin.message.dao.mongo.MessageSendLogDao;
+import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dao.mongo.ProviderOrderLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dao.mysql.GtAliasDao;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.ProviderOrderLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.synpush.AppMsgPushHandler;
@@ -59,6 +62,12 @@ public class UniPushHandler implements AppMsgPushHandler {
     private ProviderOrderLogDao providerOrderLogDao;
 
     private Map<String, IGtPush> IGtPushMap = new HashMap<>();
+
+    @Autowired
+    private MessageSendLogDao messageSendLogDao;
+
+    @Autowired
+    private Gson gson;
 
 
     // STEP1：获取应用基本信息
@@ -116,6 +125,7 @@ public class UniPushHandler implements AppMsgPushHandler {
         PushResult result = (PushResult) pushClient.pushMessageToApp(message);
         log.info("app推送结果:{}", result.getResponse().toString());
         //当result为RepeatedContent时，个推不允许15分钟重复发送数据
+        messageSendLogDao.insert(new MessageSendLog(paramDto, gson.toJson(result)));
         return result.getResponse().get("result").equals("ok");
     }
 

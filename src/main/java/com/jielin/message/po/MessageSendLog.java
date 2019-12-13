@@ -1,0 +1,52 @@
+package com.jielin.message.po;
+
+import com.jielin.message.dto.ParamDto;
+import com.jielin.message.util.enums.OperateTypeEnum;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 推送的结果日志
+ *
+ * @author yxl
+ */
+@Data
+@Document(collection = "jl_message_send_log")
+@NoArgsConstructor
+public class MessageSendLog implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    //唯一标识
+    private String _id;
+
+    //插入时间
+    private Date operateTime = new Date();
+
+    //用户id（悦姐或者用户）
+    private Integer userId;
+
+    //接收人手机号
+    private String phone;
+
+    //操作类型
+    private String operateType;
+
+    //params
+    private String params;
+
+    //推送结果
+    private String result;
+
+    public MessageSendLog(ParamDto paramDto, String result) {
+        this.userId = paramDto.getUserId();
+        this.phone = paramDto.getPhoneNumber();
+        this.operateType = OperateTypeEnum.getDescByType(paramDto.getOperateType());
+        this.params = paramDto.toString();
+        this.result = result;
+    }
+}

@@ -42,6 +42,39 @@ public enum OperateTypeEnum {
         return desc;
     }
 
+    public static String getDescByType(Integer operateType){
+        switch (operateType) {
+            case 101:
+                return OperateTypeEnum.CREATE_ORDER_SUCCESS.getDesc();
+            case 102:
+                return OperateTypeEnum.DISPATCH_ORDER_SUCCESS.getDesc();
+            case 103:
+                return OperateTypeEnum.DEPART_ORDER.getDesc();
+            case 104:
+                return OperateTypeEnum.ORDER_FINISH.getDesc();
+            case 105:
+                return OperateTypeEnum.ASSIST_CREATE_ORDER_SUCCESS.getDesc();
+            case 106:
+                return OperateTypeEnum.GROUP_DEPART_ORDER.getDesc();
+            case 107:
+                return OperateTypeEnum.DISPATCH_ORDER_SUCCESS_CUSTOMER.getDesc();
+            case 108:
+                return OperateTypeEnum.REST_CYCLE_ORDER_REMIND.getDesc();
+            case 109:
+                return OperateTypeEnum.CHANGE_SERVICE.getDesc();
+            case 110:
+                return OperateTypeEnum.CANCEL_CYCLE_SINGLE_ORDER.getDesc();
+            case 111:
+                return OperateTypeEnum.CANCEL_ORDER.getDesc();
+            case 112:
+                return OperateTypeEnum.CANCEL_ORDER_NOTIFY_CUSTOM_SERVICE.getDesc();
+            case 113:
+                return OperateTypeEnum.CANCEL_ORDER_NOTIFY_SERVICE.getDesc();
+            default:
+                throw new IllegalArgumentException("错误参数");
+        }
+    }
+
     public static OperateTypeEnum valueOf(Integer operateType) {
         switch (operateType) {
             case 101:

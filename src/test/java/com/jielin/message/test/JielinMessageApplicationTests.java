@@ -75,11 +75,11 @@ public class JielinMessageApplicationTests {
         params.put("serviceTime","11月21日14:30");
         params.put("customAddress","智慧园商务大楼131312312");
         params.put("orderType","周期清洁:周期清洁 [1人3小时x1]");
-        params.put("customPhone","18530076638");
+        params.put("customPhone","18456071819");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(102)
                 .setUserId(1652)
-                .setPhoneNumber("18530076638")
+                .setPhoneNumber("18456071819")
                 .setPlatform(0)
                 .setAppType("provider")
                 .setParams(params);
@@ -87,8 +87,8 @@ public class JielinMessageApplicationTests {
 
         String context = "hello " + new Date();
         System.out.println("Sender : " + context);
-        synMsgPushService.push(paramDto);
-        //this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
+        //synMsgPushService.push(paramDto);
+        this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
     }
 
     /**

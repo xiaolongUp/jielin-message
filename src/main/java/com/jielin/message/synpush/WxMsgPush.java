@@ -2,10 +2,12 @@ package com.jielin.message.synpush;
 
 import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
+import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
+import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.OperateLog;
 import com.jielin.message.third.enums.ThirdActionEnum;
 import com.jielin.message.util.TemplateFactory;
@@ -54,6 +56,9 @@ public class WxMsgPush extends MsgPush {
 
     @Autowired
     private ThirdApiConfig thirdApiConfig;
+
+    @Autowired
+    private MessageSendLogDao messageSendLogDao;
 
     private static HttpHeaders headers = new HttpHeaders();
 
@@ -109,6 +114,7 @@ public class WxMsgPush extends MsgPush {
             }
             //当access_token无效时刷新缓存数据
             log.info("微信公众号推送结果：{}", templateMsgResult.toString());
+            messageSendLogDao.insert(new MessageSendLog(paramDto, templateMsgResult.toString()));
             result = templateMsgResult.getErrcode() == 0;
         }
         return result;

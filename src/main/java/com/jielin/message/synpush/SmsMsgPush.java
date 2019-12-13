@@ -1,9 +1,11 @@
 package com.jielin.message.synpush;
 
 import com.jielin.message.config.YunTXSmsConfig;
+import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.SmsBean;
+import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.util.MsgConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,9 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
     @Autowired
     private TemplateDao templateDao;
 
+    @Autowired
+    private MessageSendLogDao messageSendLogDao;
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
@@ -68,6 +73,7 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             }
             SmsBean smsBean = yunTXSmsConfig.sendCommonSMS(paramDto.getPhoneNumber(), smsTemplateId,
                     params.toArray(new String[params.size()]));
+            messageSendLogDao.insert(new MessageSendLog(paramDto, smsBean.getMessage()));
             return smsBean.getIsSuccess();
         } else {
             log.info("测试环境和本地环境的短信发送：{}", paramDto.toString());
