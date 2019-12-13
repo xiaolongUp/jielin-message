@@ -13,7 +13,7 @@ import java.util.Date;
  * @author yxl
  */
 @Data
-@Document(collection = "jl_operate_log")
+@Document(collection = "jl_error_send_log")
 @NoArgsConstructor
 public class OperateLog implements Serializable {
 
@@ -24,7 +24,7 @@ public class OperateLog implements Serializable {
 
     private Date operateTime = new Date();
 
-    //操作的数据
+    //错误信息
     private Object obj;
 
     public OperateLog(Object obj) {
