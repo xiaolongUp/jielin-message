@@ -22,8 +22,11 @@ public class MsgConstant {
     //微信小程序的access_token
     public static final String WX_MP_ACCESS_TOKEN = "wx_mp_access_token";
 
-    //rabbitMq的消息推送队列名称
+    //rabbitMq的消息推送队列名称（此处的消息队列是下单流程的消息推送）
     public static final String PUSH_MSG = "push_msg";
+
+    //钉钉的消息推送队列
+    public static final String DING_PUSH_MSG = "ding_push_msg";
 
     //用户小程序平台类型（小程序）
     public static final String PLATFORM_WECHAT_MP = "wechat_mp";

@@ -4,8 +4,8 @@ import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFacto
 import com.google.gson.Gson;
 import com.jielin.message.JielinMessageApplication;
 import com.jielin.message.dao.mongo.TemplateDao;
+import com.jielin.message.dto.DingParamDto;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.po.Template;
 import com.jielin.message.service.SynMsgPushService;
 import com.jielin.message.synpush.UniPush.UniPushHandler;
 import com.jielin.message.util.MsgConstant;
@@ -15,19 +15,15 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JielinMessageApplication.class })
@@ -75,11 +71,11 @@ public class JielinMessageApplicationTests {
         params.put("serviceTime","11月21日14:30");
         params.put("customAddress","智慧园商务大楼131312312");
         params.put("orderType","周期清洁:周期清洁 [1人3小时x1]");
-        params.put("customPhone","18456071819");
+        params.put("customPhone","18530076638");
         ParamDto paramDto = new ParamDto();
         paramDto.setOperateType(102)
                 .setUserId(1652)
-                .setPhoneNumber("18456071819")
+                .setPhoneNumber("18530076638")
                 .setPlatform(0)
                 .setAppType("provider")
                 .setParams(params);
@@ -87,9 +83,21 @@ public class JielinMessageApplicationTests {
 
         String context = "hello " + new Date();
         System.out.println("Sender : " + context);
-        synMsgPushService.push(paramDto);
-        //this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
+        //synMsgPushService.push(paramDto);
+        this.rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, gson.toJson(paramDto));
     }
+
+    /**
+     * 钉钉发送消息测试
+     */
+    @Test
+    public void sendDing() {
+
+        DingParamDto paramDto = new DingParamDto();
+        paramDto.setUserId("222311554926292494").setDingMsgContent("rabbitMq测试消息的发送111！");
+        this.rabbitTemplate.convertAndSend(MsgConstant.DING_PUSH_MSG, gson.toJson(paramDto));
+    }
+
 
     /**
      *  插入模版数据
