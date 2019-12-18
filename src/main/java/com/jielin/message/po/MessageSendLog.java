@@ -4,6 +4,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.util.enums.OperateTypeEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.util.Date;
  * @author yxl
  */
 @Data
+@Accessors(chain = true)
 @Document(collection = "jl_message_send_log")
 @NoArgsConstructor
 public class MessageSendLog implements Serializable {
@@ -27,7 +29,7 @@ public class MessageSendLog implements Serializable {
     //插入时间
     private Date operateTime = new Date();
 
-    //用户id（悦姐或者用户）
+    //用户id（悦姐或者用户,或者钉钉用户id）
     private Integer userId;
 
     //接收人手机号

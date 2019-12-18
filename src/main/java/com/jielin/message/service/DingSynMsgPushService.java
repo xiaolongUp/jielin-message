@@ -1,8 +1,10 @@
 package com.jielin.message.service;
 
 import com.jielin.message.config.DingtalkConfig;
+import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dto.DingParamDto;
 import com.jielin.message.dto.TextDingMsg;
+import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.util.HttpEntityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class DingSynMsgPushService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private MessageSendLogDao messageSendLogDao;
+
     //钉钉推送
     public boolean push(DingParamDto paramDto) {
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(DingtalkConfig.DING_PUSH_MSG_URL)
@@ -46,6 +51,12 @@ public class DingSynMsgPushService {
             throw new RuntimeException("钉钉推送消息失败！");
         }
         log.info(result.toString());
+        MessageSendLog log = new MessageSendLog();
+        log.setUserId(Integer.parseInt(paramDto.getUserId()))
+                .setOperateType("钉钉推送")
+                .setParams(paramDto.toString())
+                .setResult(result.toString());
+        messageSendLogDao.insert(log);
         if (0 != (Integer) result.get("errcode")) {
             config.initToken();
             push(paramDto);
