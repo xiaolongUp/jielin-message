@@ -1,0 +1,177 @@
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "IuBdlu8fIvqE-JaEdvVN6GY35ljhrtahgbD_D8FLmPg",
+    "tmpName": "排单成功推送消息给悦姐",
+    "operateType": NumberInt(102),
+    "optionType": NumberInt(2),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "enable": true,
+    "first": "您有一笔新订单待处理",
+    "paramMap": {
+        "keyword1": "productName",
+        "keyword2": "serviceTime",
+        "keyword3": "customPhone"
+    },
+    "remark": "请尽快处理",
+    "_class": "com.jielin.message.po.Template"
+})
+
+
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "36961",
+    "tmpName": "取消订单通知悦姐（短信）",
+    "operateType": NumberInt(113),
+    "optionType": NumberInt(1),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "enable": true,
+    "paramMap": {
+
+    },
+    "_class": "com.jielin.message.po.Template",
+    "paramKeys": [
+        "serviceName",
+        "serviceTime",
+        "orderNo"
+    ]
+})
+
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "",
+    "tmpName": "取消订单通知悦姐（app）",
+    "operateType": NumberInt(113),
+    "optionType": NumberInt(3),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "content": "【悦管家】亲爱的%s，您接到的%s的订单%s用户已取消，为了不影响您的工作，请重新确认已接订单信息。有任何问题请联系悦管家客服400-0022-699",
+    "enable": true,
+    "paramMap": {
+
+    },
+    "paramKeys": [
+        "serviceName",
+        "serviceTime",
+        "orderNo"
+    ],
+    "_class": "com.jielin.message.po.Template",
+    "title": "退单处理"
+})
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "",
+    "tmpName": "排单成功app推送",
+    "operateType": NumberInt(102),
+    "optionType": NumberInt(3),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "content": "【悦管家】亲，(%s)订单已分派给您，服务时间：%s，用户号码：%s，请及时服务，为了不影响您此单的收入，开始服务后请务必在悦姐APP点击“开始服务”按钮。",
+    "enable": true,
+    "paramMap": {
+
+    },
+    "paramKeys": [
+        "productName",
+        "serviceTime",
+        "customPhone"
+    ],
+    "_class": "com.jielin.message.po.Template",
+    "title": "您有一笔新订单待处理"
+})
+
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "Rgl-N5xWdfOoZfNJCdw0oO6uapeIbcRAcWgfbOYECmg",
+    "tmpName": "取消订单小程序推送给悦姐",
+    "operateType": NumberInt(113),
+    "optionType": NumberInt(4),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "enable": true,
+    "paramMap": {
+        "character_string3": "orderNo",
+        "thing1": "customAddress",
+        "thing2": "orderType",
+        "thing5": "productName",
+        "thing12": "serviceTime"
+    },
+    "_class": "com.jielin.message.po.Template"
+})
+
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "n_5Z6KLqnOumOvPP8hPxBZAQG9mBeMKOK0chkfrqB4I",
+    "tmpName": "排单成功小程序推送消息给悦姐",
+    "operateType": NumberInt(102),
+    "optionType": NumberInt(4),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "enable": true,
+    "first": "尊敬的客户，您的服务购买成功",
+    "remark": "请您在家等候，感谢配合。联络请致电400-0022-699",
+    "paramMap": {
+        "character_string3": "orderNo",
+        "thing2": "orderType",
+        "thing4": "productName",
+        "thing7": "serviceTime",
+        "thing1": "customAddress"
+    },
+    "_class": "com.jielin.message.po.Template",
+    "paramKeys": [
+        "productName",
+        "serviceTime"
+    ]
+})
+
+
+
+
+db.getCollection("jl_msg_template").insert({
+    "tmpId": "48918",
+    "tmpName": "（悦姐）排单成功短信模板",
+    "operateType": NumberInt(102),
+    "optionType": NumberInt(1),
+    "createTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "updateTime": ISODate("2019-11-12T16:48:29.183+08:00"),
+    "enable": true,
+    "first": "尊敬的悦姐，您有一笔新订单待处理",
+    "remark": "开始服务后请务必在悦姐APP点击“开始服务”按钮",
+    "paramMap": {
+        "keyword3": "money",
+        "keyword4": "serviceTime",
+        "keyword1": "customName",
+        "keyword2": "productName"
+    },
+    "_class": "com.jielin.message.po.Template",
+    "paramKeys": [
+        "productName",
+        "serviceTime",
+        "customPhone"
+    ]
+})
+
+
+
+db.getCollection("jl_msg_template").insert({
+ 	"tmpId" : "oRoiYV5BqYCLYM-cAR6pu-K6oWSLtrMhSp6WVeOiy5o",
+	"tmpName" : "用户取消订单提醒悦姐",
+	"operateType" : 102,
+	"optionType" : 2,
+	"createTime" : ISODate("2019-11-27T16:48:29.183+08:00"),
+	"updateTime" : ISODate("2019-11-27T16:48:29.183+08:00"),
+	"enable" : true,
+	"first" : "用户订单取消提醒",
+	"paramMap" : {
+		"keyword1" : "serviceName",
+		"keyword2" : "serviceTime",
+		"keyword3" : "orderNo"
+	},
+	"remark" : "如有疑问请联系客服",
+	"_class" : "com.jielin.message.po.Template"
+})

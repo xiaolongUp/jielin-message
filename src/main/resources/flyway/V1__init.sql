@@ -79,11 +79,37 @@ CREATE TABLE `jl_msg_uniapp` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
+--jl_msg_operate
+INSERT INTO `jl_msg_operate`(`id`, `operate_name`, `operate_type`, `enable`, `push_all`, `create_time`, `update_time`) VALUES (1, '创建订单推送消息', 101, 1, 0, '2019-11-06 17:47:36', '2019-11-06 17:47:36');
+INSERT INTO `jl_msg_operate`(`id`, `operate_name`, `operate_type`, `enable`, `push_all`, `create_time`, `update_time`) VALUES (2, '订单完成', 104, 1, 0, '2019-11-13 09:43:25', '2019-11-13 09:45:55');
+INSERT INTO `jl_msg_operate`(`id`, `operate_name`, `operate_type`, `enable`, `push_all`, `create_time`, `update_time`) VALUES (3, '取消订单通知客户', 111, 1, 0, '2019-11-13 09:49:20', '2019-11-13 09:49:33');
+INSERT INTO `jl_msg_operate`(`id`, `operate_name`, `operate_type`, `enable`, `push_all`, `create_time`, `update_time`) VALUES (4, '派单成功通知悦姐', 102, 1, 0, '2019-11-21 09:36:16', '2019-11-21 09:36:36');
+INSERT INTO `jl_msg_operate`(`id`, `operate_name`, `operate_type`, `enable`, `push_all`, `create_time`, `update_time`) VALUES (5, '取消订单通知悦姐', 113, 1, 0, '2019-11-21 12:56:23', '2019-11-21 12:57:37');
+
 --插入的推送类型的数据，push_type为固定值，对应数据的枚举，如果修改同时修改枚举的数据
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (1, '短信推送', 1, 1);
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (2, '微信公众号推送', 2, 1);
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (3, 'app推送', 3, 1);
 INSERT INTO `jl_msg_option`(`id`, `push_name`, `push_type`, `enable`) VALUES (4, '微信小程序推送', 4, 1);
+
+--jl_msg_platform
+INSERT INTO `jl_msg_platform`(`id`, `name`, `platform_code`, `enable`, `create_time`, `update_time`) VALUES (1, '悦管家平台', 0, 1, '2019-11-06 17:45:54', '2019-11-06 17:45:54');
+
+--jl_msg_push
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (1, '创建订单推送数据', 1, 1, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (2, '创建订单推送数据-公众号', 1, 2, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (3, '创建订单推送数据-小程序', 1, 3, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (4, '创建订单小程序推送数据', 1, 4, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (5, '订单完成小程序推送', 2, 4, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (6, '取消订单通知客户', 3, 4, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (7, '排单成功（短信）', 4, 1, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (8, '排单成功（公众号）', 4, 2, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (9, '排单成功（app）', 4, 3, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (11, '排单成功（小程序）', 4, 4, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (12, '取消订单通知悦姐（短信）', 5, 1, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (13, '取消订单通知悦姐（公众号）', 5, 2, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (17, '取消订单通知悦姐（app）', 5, 3, 0, 1, 1);
+INSERT INTO `jl_msg_push`(`id`, `dsc`, `operate_type`, `option_value`, `platform`, `priority`, `enable`) VALUES (18, '取消订单通知悦姐（小程序）', 5, 4, 0, 1, 1);
 
 --悦姐uniapp的参数
 INSERT INTO `jl_msg_uniapp`(`id`, `app_type`, `app_id`, `app_secret`, `app_key`, `master_secret`, `enable`, `create_time`, `update_time`) VALUES (1, 'provider', '2koe01I7T19y6AqSWBLcs4', 'Zxgm8qB0xxAebPfvWWYgS8', 'Ih4SdZhHkX9fJxlPpNmQr6', 'Ugg92J4n6b9xLrrbtshtt4', 1, '2019-11-20 09:51:59', '2019-11-20 09:53:44');
