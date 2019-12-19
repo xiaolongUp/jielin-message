@@ -52,7 +52,7 @@ public class DingSynMsgPushService {
         }
         log.info(result.toString());
         MessageSendLog log = new MessageSendLog();
-        log.setUserId(Integer.parseInt(paramDto.getUserId()))
+        log.setUserId(paramDto.getUserId())
                 .setOperateType("钉钉推送")
                 .setParams(paramDto.toString())
                 .setResult(result.toString());

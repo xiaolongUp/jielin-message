@@ -94,7 +94,7 @@ public class JielinMessageApplicationTests {
     public void sendDing() {
 
         DingParamDto paramDto = new DingParamDto();
-        paramDto.setUserId("222311554926292494").setDingMsgContent("rabbitMq测试消息的发送111！");
+        paramDto.setUserId("222311554926292494").setDingMsgContent("987654321");
         this.rabbitTemplate.convertAndSend(MsgConstant.DING_PUSH_MSG, gson.toJson(paramDto));
     }
 

@@ -30,7 +30,7 @@ public class MessageSendLog implements Serializable {
     private Date operateTime = new Date();
 
     //用户id（悦姐或者用户,或者钉钉用户id）
-    private Integer userId;
+    private String userId;
 
     //接收人手机号
     private String phone;
@@ -48,7 +48,7 @@ public class MessageSendLog implements Serializable {
     private String result;
 
     public MessageSendLog(ParamDto paramDto,String pushType, String result) {
-        this.userId = paramDto.getUserId();
+        this.userId = paramDto.getUserId().toString();
         this.phone = paramDto.getPhoneNumber();
         this.operateType = OperateTypeEnum.getDescByType(paramDto.getOperateType());
         this.pushType = pushType;
