@@ -45,10 +45,10 @@ public class DingSynMsgPushService {
         request.setMsg(msg);
         OapiMessageCorpconversationAsyncsendV2Response response = client.execute(request, config.getAccessToken());
 
-        //当推送结果不成功时，获取token，再重试
+        //当推送结果不成功时，获取token，再重试，只重试一次
         if (!response.isSuccess() && retry) {
             config.initToken();
-            push(paramDto);
+            push(paramDto, false);
         }
         MessageSendLog log = new MessageSendLog();
         log.setUserId(paramDto.getUserId())
