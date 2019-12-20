@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class DingtalkConfig {
 
-    private String agentId;
+    private Long agentId;
 
     private String appKey;
 

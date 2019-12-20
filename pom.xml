@@ -170,6 +170,11 @@
             <version>1.0.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.tb.taobao</groupId>
+            <artifactId>taobao</artifactId>
+            <version>1.10</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -6,9 +6,11 @@ import com.jielin.message.JielinMessageApplication;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.DingParamDto;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.service.DingSynMsgPushService;
 import com.jielin.message.service.SynMsgPushService;
 import com.jielin.message.synpush.UniPush.UniPushHandler;
 import com.jielin.message.util.MsgConstant;
+import com.taobao.api.ApiException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -53,6 +55,9 @@ public class JielinMessageApplicationTests {
     @Autowired
     private SynMsgPushService synMsgPushService;
 
+    @Autowired
+    DingSynMsgPushService service;
+
     /**
      * 发送rabbitMq的消息
      */
@@ -91,11 +96,12 @@ public class JielinMessageApplicationTests {
      * 钉钉发送消息测试
      */
     @Test
-    public void sendDing() {
+    public void sendDing() throws ApiException {
 
         DingParamDto paramDto = new DingParamDto();
-        paramDto.setUserId("222311554926292494").setDingMsgContent("987654321");
-        this.rabbitTemplate.convertAndSend(MsgConstant.DING_PUSH_MSG, gson.toJson(paramDto));
+        paramDto.setUserId("222311554926292494").setDingMsgContent("大河哈刚发的户外去哦大");
+        service.push(paramDto);
+        //this.rabbitTemplate.convertAndSend(MsgConstant.DING_PUSH_MSG, gson.toJson(paramDto));
     }
 
 

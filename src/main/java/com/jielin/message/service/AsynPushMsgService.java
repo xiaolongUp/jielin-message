@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jielin.message.dto.DingParamDto;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.util.MsgConstant;
+import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -48,7 +49,11 @@ public class AsynPushMsgService {
     @RabbitListener(queues = MsgConstant.DING_PUSH_MSG)
     public void dingProcess(String dingParamDto) {
         DingParamDto param = gson.fromJson(dingParamDto, DingParamDto.class);
-        dingSynMsgPushService.push(param);
+        try {
+            dingSynMsgPushService.push(param);
+        } catch (ApiException e) {
+            log.error("钉钉推送报错：", e);
+        }
         log.info("Receiver  : {}", dingParamDto);
     }
 
