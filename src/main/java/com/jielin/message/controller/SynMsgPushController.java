@@ -50,7 +50,7 @@ public class SynMsgPushController {
         template.setTmpId("103050")
                 .setTmpName("订单创建成功短信模板")
                 .setOperateType(101).setOptionType(1)
-                .setFirst("尊敬的客户，您的服务购买成功")
+                .setTitle("尊敬的客户，您的服务购买成功")
                 .setParamMap(params)
                 .setRemark("请您在家等候，感谢配合。联络请致电400-0022-699")
                 .setCreateTime(new Date())

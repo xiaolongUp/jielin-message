@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -42,18 +41,10 @@ public class Template implements Serializable {
     //事例
     private String example;
 
-    //公众号特有字段
-    private String first;
-
-    private String remark;
-
-    //app信息特有字段
+    //公众号和app拥有title（为公众号当中的first）
     private String title;
 
-    private String content;
-
-    //app字段信息
-    private List<String> paramKeys;
+    private String remark;
 
     //小程序和公众号字段信息
     private Map<String,String> paramMap;

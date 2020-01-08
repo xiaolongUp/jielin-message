@@ -35,6 +35,6 @@ public class MenuService {
             menu.setChildren(childDto);
             menuDto.add(menu);
         }
-        return new ResponseDto(menuDto);
+        return new ResponseDto<>(menuDto);
     }
 }

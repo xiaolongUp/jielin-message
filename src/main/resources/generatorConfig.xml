@@ -18,12 +18,12 @@
         <commentGenerator>
             <property name="suppressAllComments" value="false"/>
         </commentGenerator>
-        <!--<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://121.43.235.99:3306/jl"
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://121.43.235.99:3306/jl"
                         userId="jielin" password="jielin123">
-        </jdbcConnection>-->
-        <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/test"
-                        userId="root" password="123456">
         </jdbcConnection>
+        <!--<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/test"
+                        userId="root" password="123456">
+        </jdbcConnection>-->
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
@@ -39,6 +39,6 @@
         </javaClientGenerator>
 
         <!-- 数据表 -->
-        <table tableName="jl_msg_operate" domainObjectName="OperatePo" mapperName="OperateDao"/>
+        <table tableName="jl_msg_user" domainObjectName="MsgUserPo" mapperName="MsgUserDao"/>
     </context>
 </generatorConfiguration>

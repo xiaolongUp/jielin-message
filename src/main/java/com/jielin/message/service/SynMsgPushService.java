@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
 
@@ -61,7 +60,8 @@ public class SynMsgPushService {
             }
         } else {
             //获取需要推送消息的
-            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(), paramDto.getPlatform());
+            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
+                    PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
             //当没有配置推送规则时，默认需要推送一条短信
             if (msgPushes.isEmpty()) {
                 try {
@@ -87,13 +87,13 @@ public class SynMsgPushService {
                     MsgPush push = msgPushMap.get(pushHandler);
                     try {
                         result = push.pushMsg(paramDto);
+                        //当前规则推送成功后下面的规则停止推送
+                       /* if (result && msgPushPo.getNextStop()) {
+                            break;
+                        }*/
                     } catch (Exception e) {
                         //do nothing
                     }
-                    //当有规则发送消息成功且发送消息的不为app时，中断
-                    /*if (result && !(push instanceof SmsMsgPush)) {
-                        break;
-                    }*/
                 }
 
             }

@@ -38,7 +38,7 @@ public class UniPushConfig {
         List<UniappPo> uniappPos = uniappDao.selectByExample(new UniappPoCriteria());
         for (UniappPo uniappPo : uniappPos) {
             UniPush uniPush = this.getUniPush(uniappPo);
-            this.uniPushMap.put(uniappPo.getAppType(), uniPush);
+            this.uniPushMap.put(uniappPo.getAppType().concat(uniappPo.getPlatform().toString()), uniPush);
         }
     }
 

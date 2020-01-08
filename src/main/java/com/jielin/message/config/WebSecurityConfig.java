@@ -22,7 +22,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             new String[]{"/js/**", "/css/**", "/images/**", "/layui/**"};
     //不需要拦截的动态资源
     private static final String[] HTTP_RESOURCE =
-            new String[]{"/login", "/push/**", "/user/**", "/gt/**"};
+            new String[]{"/login", "/push/**", "/user/**", "/gt/**","/hi"};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

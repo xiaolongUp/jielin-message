@@ -40,7 +40,6 @@ public class ThirdApiConfig {
         Map<String, String> params = new HashMap<>();
         params.put("username", this.jlWebUserName);
         params.put("password", this.jlWebPassword);
-        params.put("cid", "");
         ResponseEntity<ResponsePackDto> result
                 = restTemplate.exchange(url, ThirdActionEnum.JL_WEB_ACCESS_TOKEN.getRequestType(), HttpEntityUtil.getHttpEntity(params), ResponsePackDto.class);
         if (result.getStatusCode().equals(HttpStatus.OK) &&

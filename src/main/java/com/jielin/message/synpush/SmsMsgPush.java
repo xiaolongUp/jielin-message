@@ -8,7 +8,7 @@ import com.jielin.message.dto.SmsBean;
 import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.util.MsgConstant;
-import com.jielin.message.util.enums.PushTypeEnum;
+import com.jielin.message.util.SortUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -64,7 +64,7 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
                 return false;
             }
 
-            List<String> paramKeys = template.getParamKeys();
+            List<String> paramKeys = SortUtil.sortByMapKey(template.getParamMap());
             List<String> params = new ArrayList<>();
             if (paramKeys.isEmpty()) {
                 return false;

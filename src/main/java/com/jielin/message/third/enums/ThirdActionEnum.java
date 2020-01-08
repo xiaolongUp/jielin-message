@@ -6,8 +6,6 @@ public enum ThirdActionEnum {
     JL_WEB_ACCESS_TOKEN("/service/login", HttpMethod.POST, "获取token"),
     JL_WEB_ADMIN_USER("/service/thirdApp/adminUser", HttpMethod.GET, "获取登录用户"),
     JL_WEB_ADMIN_ROLE("/service/thirdApp/adminRole", HttpMethod.GET, "获取登录用户权限"),
-    JL_WEB_CUSTOM_USER("/service/thirdApp/customUser", HttpMethod.GET, "获取客户信息"),
-    JL_WEB_SERVICE_USER("/service/thirdApp/serviceUser", HttpMethod.GET, "获取悦姐信息"),
     JL_WEB_AUTH_MEMBER("/service/thirdApp/authMember", HttpMethod.GET, "获取悦姐信息")
     ;
 

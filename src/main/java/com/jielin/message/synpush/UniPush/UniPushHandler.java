@@ -16,22 +16,29 @@ import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.gexin.rp.sdk.template.style.Style0;
 import com.google.gson.Gson;
 import com.jielin.message.config.AppPushConfig;
+import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.UniPushConfig;
 import com.jielin.message.dao.mongo.MessageSendLogDao;
-import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dao.mongo.ProviderOrderLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
-import com.jielin.message.dao.mysql.GtAliasDao;
+import com.jielin.message.dao.mysql.MsgThirdDao;
+import com.jielin.message.dao.mysql.MsgUserDao;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.po.MessageSendLog;
-import com.jielin.message.po.ProviderOrderLog;
-import com.jielin.message.po.Template;
+import com.jielin.message.dto.ResponsePackDto;
+import com.jielin.message.po.*;
+import com.jielin.message.service.PlatformService;
 import com.jielin.message.synpush.AppMsgPushHandler;
 import com.jielin.message.util.TemplateFactory;
 import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -51,9 +58,6 @@ public class UniPushHandler implements AppMsgPushHandler {
     private TemplateDao templateDao;
 
     @Autowired
-    private GtAliasDao gtAliasDao;
-
-    @Autowired
     private TemplateFactory templateFactory;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -68,6 +72,18 @@ public class UniPushHandler implements AppMsgPushHandler {
 
     @Autowired
     private Gson gson;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private MsgThirdDao thirdDao;
+
+    @Autowired
+    private ThirdApiConfig thirdApiConfig;
+
+    @Autowired
+    private MsgUserDao msgUserDao;
 
 
     // STEP1：获取应用基本信息
@@ -85,7 +101,9 @@ public class UniPushHandler implements AppMsgPushHandler {
     public boolean sendPushAll(ParamDto paramDto) throws Exception {
         Template tmp = templateDao.
                 selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
-        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(paramDto.getAppType());
+
+        String uniPushName = paramDto.getUserType().concat(PlatformService.platformMap.get(paramDto.getPlatform()).toString());
+        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(uniPushName);
         if (!Optional.ofNullable(tmp).isPresent()) {
             return false;
         }
@@ -105,9 +123,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         }
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
                 appTemplate, appId, appKey);
-        if (!Optional.ofNullable(template).isPresent()) {
-            return false;
-        }
         // STEP5：定义"AppMessage"类型消息对象,设置推送消息有效期等推送参数
         List<String> appIds = new ArrayList<>();
         appIds.add(appId);
@@ -118,7 +133,7 @@ public class UniPushHandler implements AppMsgPushHandler {
         message.setOfflineExpireTime(24 * 1000 * 3600);  // 时间单位为毫秒
 
         // STEP6：执行推送
-        IGtPush pushClient = this.IGtPushMap.get(paramDto.getAppType());
+        IGtPush pushClient = this.IGtPushMap.get(uniPushName);
         if (!Optional.ofNullable(pushClient).isPresent()) {
             return false;
         }
@@ -132,6 +147,10 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Override
     public boolean sendPushToSingle(ParamDto paramDto) throws Exception {
 
+        String userType = paramDto.getUserType();
+        Integer userId = paramDto.getUserId();
+        Integer platform = paramDto.getPlatform();
+
         Template tmp = templateDao.
                 selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
         if (!Optional.ofNullable(tmp).isPresent()) {
@@ -141,7 +160,8 @@ public class UniPushHandler implements AppMsgPushHandler {
         if (StringUtils.isBlank(appTemplate)) {
             return false;
         }
-        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(paramDto.getAppType());
+        String uniPushName = paramDto.getUserType().concat(PlatformService.platformMap.get(platform).toString());
+        UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(uniPushName);
         if (!Optional.ofNullable(uniPush).isPresent()) {
             return false;
         }
@@ -150,9 +170,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         String appKey = uniPush.getAppKey();
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
                 appTemplate, appId, appKey);
-        if (!Optional.ofNullable(template).isPresent()) {
-            return false;
-        }
         SingleMessage message = new SingleMessage();
         message.setData(template);
         // 设置消息离线，并设置离线时间
@@ -163,9 +180,73 @@ public class UniPushHandler implements AppMsgPushHandler {
         Target target = new Target();
 
         target.setAppId(appId);
-        String alias = gtAliasDao.selectAliasByPhone(paramDto.getAppType(), paramDto.getPhoneNumber());
+        //通过平台类型和推送类型获取调用的接口获取别名
+        String alias = null;
+        MsgThirdPoCriteria criteria = new MsgThirdPoCriteria();
+        criteria.createCriteria()
+                .andPlatformEqualTo(platform)
+                .andUserTypeEqualTo(userType)
+                .andPushTypeEqualTo(PushTypeEnum.APP_PUSH.getType());
+        List<MsgThirdPo> msgThirdPos = thirdDao.selectByExample(criteria);
+        if (CollectionUtils.isEmpty(msgThirdPos)) {
+            return false;
+        }
+        MsgThirdPo msgThird = msgThirdPos.get(0);
+        String builder = thirdApiConfig.getJlWebApiUrl() + msgThird.getUrl();
+        String authBuilder = new URIBuilder(builder)
+                .addParameter("appType", userType)
+                .addParameter("phone", paramDto.getPhoneNumber())
+                .build().toString();
+        ResponseEntity<ResponsePackDto> authResult = null;
+        //更新用户所在平台的别名
+        boolean hasException = false;
+        MsgUserPo msgUserPo =
+                msgUserDao.selectByCondition(platform, userType, userId);
+        try {
+            authResult = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
+        } catch (Exception e) {
+            //调用接口发生异常时，使用本地存储数据
+            hasException = true;
+            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
+                alias = msgUserPo.getUniappAlias();
+            }
+        }
+
+        if (authResult != null && authResult.getStatusCode().equals(HttpStatus.OK) &&
+                null != authResult.getBody()) {
+            if (null != authResult.getBody().getBody()) {
+                alias = (String) authResult.getBody().getBody();
+                if (null == msgUserPo) {
+                    MsgUserPo record = new MsgUserPo();
+                    record.setPlatform(platform);
+                    record.setUserType(userType);
+                    record.setUserId(userId);
+                    record.setUserPhone(paramDto.getPhoneNumber());
+                    record.setUniappAlias(alias);
+                    msgUserDao.insert(record);
+                } else if (StringUtils.isBlank(msgUserPo.getUniappAlias())) {
+                    msgUserPo.setUniappAlias(alias);
+                    MsgUserPoCriteria example = new MsgUserPoCriteria();
+                    example.createCriteria()
+                            .andUserIdEqualTo(userId)
+                            .andUserTypeEqualTo(userType)
+                            .andPlatformEqualTo(platform);
+                    msgUserDao.updateByExample(msgUserPo, example);
+                }
+            }
+        }
+        //当调用接口没有发生异常且接口没有返回数据时，重试使用本地的存储数据
+        if (StringUtils.isBlank(alias) && !hasException) {
+
+            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
+                alias = msgUserPo.getUniappAlias();
+            }
+        }
+        if (StringUtils.isBlank(alias)) {
+            return false;
+        }
         target.setAlias(alias); //别名需要提前绑定
-        IGtPush pushClient = this.IGtPushMap.get(paramDto.getAppType());
+        IGtPush pushClient = this.IGtPushMap.get(uniPushName);
         if (!Optional.ofNullable(pushClient).isPresent()) {
             return false;
         }

@@ -1,10 +1,7 @@
 package com.jielin.message.service;
 
-import com.google.gson.Gson;
-import com.jielin.message.dto.DingParamDto;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.util.MsgConstant;
-import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -22,40 +19,13 @@ public class AsynPushMsgService {
 
     @Autowired
     private SynMsgPushService synMsgPushService;
-    @Autowired
-    private DingSynMsgPushService dingSynMsgPushService;
-    @Autowired
-    private Gson gson;
 
-    //本系统需要投递的数据，直接通过对象投递
+    //监听消息队列当中的数据
     @RabbitHandler
     @RabbitListener(queues = MsgConstant.PUSH_MSG)
     public void process(ParamDto paramDto) {
-        //synMsgPushService.push(paramDto);
+        synMsgPushService.push(paramDto);
         log.info("Receiver  : {}", paramDto.toString());
     }
-
-    //所有其他系统投递的数据都为字符转
-    @RabbitHandler
-    @RabbitListener(queues = MsgConstant.PUSH_MSG)
-    public void process(String paramDto) {
-        ParamDto param = gson.fromJson(paramDto, ParamDto.class);
-        synMsgPushService.push(param);
-        log.info("Receiver  : {}", paramDto);
-    }
-
-    //钉钉推送的消息队列
-    @RabbitHandler
-    @RabbitListener(queues = MsgConstant.DING_PUSH_MSG)
-    public void dingProcess(String dingParamDto) {
-        DingParamDto param = gson.fromJson(dingParamDto, DingParamDto.class);
-        try {
-            dingSynMsgPushService.push(param);
-        } catch (ApiException e) {
-            log.error("钉钉推送报错：", e);
-        }
-        log.info("Receiver  : {}", dingParamDto);
-    }
-
 
 }

@@ -14,7 +14,8 @@ public enum PushTypeEnum {
     SMS_PUSH(1, "短信推送"),
     WX_NP_PUSH(2, "微信公众号推送"),
     APP_PUSH(3, "app推送"),
-    WX_MP_PUSH(4, "微信小程序推送");
+    WX_MP_PUSH(4, "微信小程序推送"),
+    DING_PUSH(5, "钉钉推送");
 
     //类型
     private int type;
@@ -45,6 +46,8 @@ public enum PushTypeEnum {
                 return "appMsgPush";
             case 4:
                 return "wxMpMsgPush";
+            case 5:
+                return "dingMsgPush";
             default:
                 return "";
         }
@@ -62,7 +65,8 @@ public enum PushTypeEnum {
                 return PushTypeEnum.APP_PUSH;
             case 4:
                 return PushTypeEnum.WX_MP_PUSH;
-
+            case 5:
+                return PushTypeEnum.DING_PUSH;
             default:
                 throw new IllegalArgumentException("错误参数");
         }

@@ -68,12 +68,12 @@ public class TemplateFactory {
      */
     private String getAppTemplate(ParamDto paramDto, Template template) {
 
-        List<String> paramKeys = template.getParamKeys();
+        List<String> paramKeys = SortUtil.sortByMapKey(template.getParamMap());
         List<String> params = new ArrayList<>();
         for (String key : paramKeys) {
             params.add((String) paramDto.getParams().get(key));
         }
-        return String.format(template.getContent(), params.toArray(new String[params.size()]));
+        return String.format(template.getExample(), params.toArray(new String[params.size()]));
     }
 
     /**
@@ -88,8 +88,8 @@ public class TemplateFactory {
         WechatTemplateMsg templateMsg = new WechatTemplateMsg();
         templateMsg.setTemplate_id(template.getTmpId())
                 .setTouser(toUser);
-        if (StringUtils.isNotBlank(template.getFirst())) {
-            templateMsg.add(FIRST, template.getFirst(), COLOR);
+        if (StringUtils.isNotBlank(template.getTitle())) {
+            templateMsg.add(FIRST, template.getTitle(), COLOR);
         }
         if (StringUtils.isNotBlank(template.getJumpAddress())) {
             templateMsg.setUrl(template.getJumpAddress());
