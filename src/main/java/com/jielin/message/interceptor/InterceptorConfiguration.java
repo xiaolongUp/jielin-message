@@ -1,6 +1,10 @@
 package com.jielin.message.interceptor;
 
+import com.jielin.message.util.MsgConstant;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -11,14 +15,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author yxl
  */
 @Component
-public class InterceptorConfiguration implements WebMvcConfigurer {
+public class InterceptorConfiguration implements WebMvcConfigurer, ApplicationContextAware {
 
-   @Autowired
+    private ApplicationContext context;
+
+    @Autowired
     private AccessInterceptor accessInterceptor;
 
+    //当测试环境和正式环境需要设置调用白名单
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //registry.addInterceptor(accessInterceptor).addPathPatterns("/**");
+        String activeProfile = context.getEnvironment().getActiveProfiles()[0];
+        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)
+                || MsgConstant.TEST_PROFILE.equalsIgnoreCase(activeProfile)) {
+            registry.addInterceptor(accessInterceptor).addPathPatterns("/**");
+        }
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
 }

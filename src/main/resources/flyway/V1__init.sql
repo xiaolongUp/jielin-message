@@ -129,6 +129,7 @@ CREATE TABLE `jl_msg_user` (
   `wx_gzh_openid` varchar(50) DEFAULT NULL COMMENT '用户的微信公众号的openid',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  UNIQUE KEY(platform, user_type,user_id),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/product")
 public class ProducerController {
@@ -18,7 +20,7 @@ public class ProducerController {
 
     //生产消息，所有的系统都需要通过http请求调用该接口推送数据
     @PostMapping(value = "/msg")
-    public ResponseDto productMsg(@RequestBody ParamDto paramDto) {
+    public ResponseDto productMsg(@RequestBody @Valid ParamDto paramDto) {
         producerService.send(paramDto);
         return new ResponseDto();
     }

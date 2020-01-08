@@ -62,7 +62,7 @@
     <Loggers>
         <Root level="INFO">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref ="MailAppender"/>
+<!--            <AppenderRef ref ="MailAppender"/>-->
             <AppenderRef ref="RollingFileInfo"/>
             <AppenderRef ref="RollingFileError"/>
         </Root>

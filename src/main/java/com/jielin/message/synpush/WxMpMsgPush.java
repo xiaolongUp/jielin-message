@@ -93,7 +93,6 @@ public class WxMpMsgPush extends MsgPush {
 
         String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
         String authBuilder = new URIBuilder(authUrl)
-                .addParameter("token", thirdApiConfig.getJlWebAccessToken())
                 .addParameter("customId", paramDto.getUserId().toString())
                 .addParameter("platform", wxPlatform)
                 .build().toString();
@@ -114,7 +113,6 @@ public class WxMpMsgPush extends MsgPush {
         }
 
         if (null != authResult && null != authResult.getBody() && authResult.getBody().getStatus() == 3) {
-            thirdApiConfig.init();
             this.pushMsg(paramDto);
         } else if (null != authResult && authResult.getStatusCode().equals(HttpStatus.OK) &&
                 null != authResult.getBody()) {
