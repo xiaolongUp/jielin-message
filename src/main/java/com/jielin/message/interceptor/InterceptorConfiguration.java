@@ -26,8 +26,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer, ApplicationCo
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         String activeProfile = context.getEnvironment().getActiveProfiles()[0];
-        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)
-                || MsgConstant.TEST_PROFILE.equalsIgnoreCase(activeProfile)) {
+        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)) {
             registry.addInterceptor(accessInterceptor).addPathPatterns("/**");
         }
     }
