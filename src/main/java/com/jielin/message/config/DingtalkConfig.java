@@ -54,5 +54,6 @@ public class DingtalkConfig {
 
     public static final String DING_PUSH_MSG_URL = "https://oapi.dingtalk.com/topapi/message/corpconversation/asyncsend_v2";
 
+    public static final String GET_USER_BY_MOBILE_URL = "https://oapi.dingtalk.com/user/get_by_mobile";
 
 }

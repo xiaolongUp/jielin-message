@@ -172,9 +172,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.tb.taobao</groupId>
-            <artifactId>taobao</artifactId>
-            <version>1.10</version>
+            <groupId>com.taobao.dingding</groupId>
+            <artifactId>ding-java-auto</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.ctrip.framework.apollo</groupId>

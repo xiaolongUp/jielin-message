@@ -146,8 +146,7 @@ public class JielinMessageApplicationTests {
                 .setUserType("provider");
         paramDto.getDingMsg()
                 .setDingMsgType("text")
-                .setDingUserId("222311554926292494")
-                .setDingMsgContent("大河哈刚发的户外去哦大");
+                .setDingMsgContent("大河哈刚发的户外去哦大1234567890");
         rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, paramDto);
     }
 

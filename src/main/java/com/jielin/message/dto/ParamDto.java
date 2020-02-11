@@ -54,8 +54,6 @@ public class ParamDto implements Serializable {
     @NoArgsConstructor
     public class DingMsg {
 
-        private String DingUserId;
-
         //推送的消息类型（文本消息
         //图片消息
         //语音消息
