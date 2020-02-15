@@ -26,8 +26,10 @@ public class InterceptorConfiguration implements WebMvcConfigurer, ApplicationCo
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         String activeProfile = context.getEnvironment().getActiveProfiles()[0];
-        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)) {
-            registry.addInterceptor(accessInterceptor).addPathPatterns("/**");
+        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)
+                || MsgConstant.TEST_PROFILE.equalsIgnoreCase(activeProfile)) {
+            //白名单安全策略，需要开放的时候启用
+            //registry.addInterceptor(accessInterceptor).addPathPatterns("/**");
         }
     }
 
