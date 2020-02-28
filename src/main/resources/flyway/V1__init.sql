@@ -143,3 +143,14 @@ CREATE TABLE `jl_msg_third` (
   `http_method` varchar(10) DEFAULT NULL COMMENT '请求类型',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+--投递结果表
+CREATE TABLE `jl_msg_send_result` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `correlation_id` varchar(20) NOT NULL COMMENT '消息的uuid',
+  `message_id` varchar(255) DEFAULT NULL COMMENT '保证幂等性的唯一标示，暂时没用到',
+  `content` text NOT NULL COMMENT '投递的消息内容',
+  `result` int(2) NOT NULL COMMENT '0:投递中，1:投递成功，2:投递失败',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `correlation_id` (`correlation_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

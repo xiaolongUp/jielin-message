@@ -2,7 +2,7 @@ package com.jielin.message.service;
 
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.util.MsgConstant;
-import org.springframework.amqp.core.AmqpTemplate;
+import com.jielin.message.util.OrderMessageSendAsync;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 public class ProducerService {
 
     @Autowired
-    private AmqpTemplate rabbitTemplate;
+    private OrderMessageSendAsync orderMessageSendAsync;
 
     public void send(ParamDto paramDto) {
-        rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, paramDto);
+        orderMessageSendAsync.sendMsg("", MsgConstant.PUSH_MSG, paramDto);
     }
 }
