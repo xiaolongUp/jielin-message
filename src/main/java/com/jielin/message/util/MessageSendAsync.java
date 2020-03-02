@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class OrderMessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
+public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
 
 
     private static final SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
@@ -33,7 +33,7 @@ public class OrderMessageSendAsync implements RabbitTemplate.ConfirmCallback, Ra
      * @param rabbitTemplate
      */
     @Autowired
-    public OrderMessageSendAsync(RabbitTemplate rabbitTemplate, MsgSendResultDao msgSendResultDao, Gson gson) {
+    public MessageSendAsync(RabbitTemplate rabbitTemplate, MsgSendResultDao msgSendResultDao, Gson gson) {
         this.rabbitTemplate = rabbitTemplate;
         this.msgSendResultDao = msgSendResultDao;
         this.gson = gson;
