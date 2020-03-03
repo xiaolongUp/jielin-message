@@ -1,4 +1,4 @@
-package com.jielin.message.synpush;
+package com.jielin.message.synpush.app;
 
 import com.jielin.message.dto.ParamDto;
 

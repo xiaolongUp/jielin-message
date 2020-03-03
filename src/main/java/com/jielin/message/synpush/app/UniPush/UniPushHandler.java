@@ -1,4 +1,4 @@
-package com.jielin.message.synpush.UniPush;
+package com.jielin.message.synpush.app.UniPush;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +27,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.po.*;
 import com.jielin.message.service.PlatformService;
-import com.jielin.message.synpush.AppMsgPushHandler;
+import com.jielin.message.synpush.app.AppMsgPushHandler;
 import com.jielin.message.util.TemplateFactory;
 import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;

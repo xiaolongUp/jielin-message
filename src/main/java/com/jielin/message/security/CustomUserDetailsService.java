@@ -6,8 +6,7 @@ import com.jielin.message.dao.mysql.AdminUserDao;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.po.AdminRolePo;
 import com.jielin.message.po.AdminUserPo;
-import com.jielin.message.third.enums.ThirdActionEnum;
-import com.jielin.message.util.HttpEntityUtil;
+import com.jielin.message.util.enums.ThirdActionEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriBuilder;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.jielin.message.config;
 
-import com.jielin.message.synpush.AppMsgPushHandler;
-import com.jielin.message.synpush.UniPush.UniPushHandler;
+import com.jielin.message.synpush.app.AppMsgPushHandler;
+import com.jielin.message.synpush.app.UniPush.UniPushHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;

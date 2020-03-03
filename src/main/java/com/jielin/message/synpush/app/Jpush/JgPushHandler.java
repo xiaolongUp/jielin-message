@@ -1,4 +1,4 @@
-package com.jielin.message.synpush.Jpush;
+package com.jielin.message.synpush.app.Jpush;
 
 import cn.jiguang.common.resp.APIConnectionException;
 import cn.jiguang.common.resp.APIRequestException;
@@ -7,7 +7,7 @@ import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
 import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.synpush.AppMsgPushHandler;
+import com.jielin.message.synpush.app.AppMsgPushHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 

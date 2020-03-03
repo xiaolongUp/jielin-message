@@ -1,4 +1,4 @@
-package com.jielin.message.synpush;
+package com.jielin.message.synpush.wx;
 
 import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
@@ -12,8 +12,9 @@ import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.MsgUserPo;
 import com.jielin.message.po.MsgUserPoCriteria;
 import com.jielin.message.po.OperateLog;
-import com.jielin.message.third.enums.ThirdActionEnum;
+import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.util.TemplateFactory;
+import com.jielin.message.util.enums.ThirdActionEnum;
 import com.jielin.message.util.wechat.WechatTokenHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -162,5 +163,10 @@ public class WxMsgPush extends MsgPush {
             result = templateMsgResult.getErrcode() == 0;
         }
         return result;
+    }
+
+    @Override
+    public boolean supports(Integer handlerType) {
+        return WX_NP_PUSH.getType() == handlerType;
     }
 }

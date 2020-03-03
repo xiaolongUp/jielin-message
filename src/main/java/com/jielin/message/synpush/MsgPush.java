@@ -32,4 +32,5 @@ public abstract class MsgPush {
         return false;
     }
 
+    public abstract boolean supports(Integer handlerType);
 }

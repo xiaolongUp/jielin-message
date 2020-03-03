@@ -1,4 +1,4 @@
-package com.jielin.message.synpush;
+package com.jielin.message.synpush.ding;
 
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
@@ -10,6 +10,8 @@ import com.jielin.message.config.DingtalkConfig;
 import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.MessageSendLog;
+import com.jielin.message.synpush.MsgPush;
+import com.jielin.message.util.enums.PushTypeEnum;
 import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,11 @@ public class DingMsgPush extends MsgPush {
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
         return push(paramDto);
+    }
+
+    @Override
+    public boolean supports(Integer handlerType) {
+        return PushTypeEnum.DING_PUSH.getType() == handlerType;
     }
 
     //钉钉推送

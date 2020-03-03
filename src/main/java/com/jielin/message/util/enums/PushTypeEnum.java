@@ -1,13 +1,10 @@
 package com.jielin.message.util.enums;
 
-import com.jielin.message.po.MsgPushPo;
-
 /**
  * 推送的类型枚举
  *
  * @author yxl
  */
-@SuppressWarnings("unused")
 public enum PushTypeEnum {
 
     NO_PUSH(0, "不推送"),
@@ -34,23 +31,6 @@ public enum PushTypeEnum {
 
     public String getDesc() {
         return desc;
-    }
-
-    public static String getMsgPush(MsgPushPo msgPushPo) {
-        switch (msgPushPo.getOptionValue()) {
-            case 1:
-                return "smsMsgPush";
-            case 2:
-                return "wxMsgPush";
-            case 3:
-                return "appMsgPush";
-            case 4:
-                return "wxMpMsgPush";
-            case 5:
-                return "dingMsgPush";
-            default:
-                return "";
-        }
     }
 
     public static PushTypeEnum valueOf(Integer pushType) {

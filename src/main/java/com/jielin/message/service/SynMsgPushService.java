@@ -6,14 +6,14 @@ import com.jielin.message.po.MsgPushPo;
 import com.jielin.message.po.OperatePo;
 import com.jielin.message.po.OperatePoCriteria;
 import com.jielin.message.synpush.MsgPush;
-import com.jielin.message.synpush.SmsMsgPush;
-import com.jielin.message.util.enums.PushTypeEnum;
+import com.jielin.message.synpush.sms.SmsMsgPush;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,15 @@ public class SynMsgPushService {
     @Autowired
     private SmsMsgPush smsMsgPush;
 
+    private List<MsgPush> pushHandlers = new ArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        for (Map.Entry<String, MsgPush> msgPush : msgPushMap.entrySet()) {
+            this.pushHandlers.add(msgPush.getValue());
+        }
+    }
+
     //根据参数选择不同的推送方式
     public boolean push(ParamDto paramDto) {
         boolean result = false;
@@ -49,54 +58,40 @@ public class SynMsgPushService {
                 .andOperateTypeEqualTo(paramDto.getOperateType())
                 .andPushAllEqualTo(true);
         List<OperatePo> operatePos = operateDao.selectByExample(criteria);
-        //所有的推送方式都去推送该消息
-        if (!operatePos.isEmpty()) {
-            for (Map.Entry<String, MsgPush> msgPush : msgPushMap.entrySet()) {
-                try {
-                    result = msgPush.getValue().pushMsg(paramDto);
-                } catch (Exception e) {
-                    //do nothing
+        try {
+            //所有的推送方式都去推送该消息
+            if (!operatePos.isEmpty()) {
+                for (MsgPush pushHandler : pushHandlers) {
+                    result = pushHandler.pushMsg(paramDto);
                 }
-            }
-        } else {
-            //获取需要推送消息的
-            List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
-                    PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
-            //当没有配置推送规则时，默认需要推送一条短信
-            if (msgPushes.isEmpty()) {
-                try {
+            } else {
+                //获取需要推送消息的
+                List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
+                        PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
+                //当没有配置推送规则时，默认需要推送一条短信
+                if (msgPushes.isEmpty()) {
                     result = smsMsgPush.pushMsg(paramDto);
-                } catch (Exception e) {
-                    //do nothing
                 }
-            }
-            //当只配置app推送的时候，同样需要推送一条短信推送
-            if (msgPushes.size() == 1
-                    && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
-                try {
+                //当只配置app推送的时候，同样需要推送一条短信推送
+                if (msgPushes.size() == 1
+                        && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
                     log.info("推送了一条短信：" + paramDto.toString());
                     result = smsMsgPush.pushMsg(paramDto);
-                } catch (Exception e) {
-                    //do nothing
-                }
 
-            }
-            for (MsgPushPo msgPushPo : msgPushes) {
-                String pushHandler = PushTypeEnum.getMsgPush(msgPushPo);
-                if (StringUtils.isNoneBlank(pushHandler)) {
-                    MsgPush push = msgPushMap.get(pushHandler);
-                    try {
-                        result = push.pushMsg(paramDto);
-                        //当前规则推送成功后下面的规则停止推送
-                       /* if (result && msgPushPo.getNextStop()) {
-                            break;
-                        }*/
-                    } catch (Exception e) {
-                        //do nothing
+                }
+                for (MsgPushPo msgPushPo : msgPushes) {
+                    for (MsgPush pushHandler : pushHandlers) {
+                        //判断当前的推送方式释放支持
+                        boolean supports = pushHandler.supports(msgPushPo.getOptionValue());
+                        if (supports) {
+                            result = pushHandler.pushMsg(paramDto);
+                        }
                     }
                 }
-
             }
+
+        } catch (Exception e) {
+            //do nothing
         }
 
         return result;

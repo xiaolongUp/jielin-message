@@ -1,4 +1,4 @@
-package com.jielin.message.synpush.Jpush;
+package com.jielin.message.synpush.app.Jpush;
 
 import cn.jiguang.common.resp.APIConnectionException;
 import cn.jiguang.common.resp.APIRequestException;

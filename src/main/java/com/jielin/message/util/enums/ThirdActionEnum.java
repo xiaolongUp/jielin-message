@@ -1,4 +1,4 @@
-package com.jielin.message.third.enums;
+package com.jielin.message.util.enums;
 
 import org.springframework.http.HttpMethod;
 

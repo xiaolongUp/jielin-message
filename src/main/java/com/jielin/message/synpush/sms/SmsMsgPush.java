@@ -1,4 +1,4 @@
-package com.jielin.message.synpush;
+package com.jielin.message.synpush.sms;
 
 import com.jielin.message.config.YunTXSmsConfig;
 import com.jielin.message.dao.mongo.MessageSendLogDao;
@@ -7,6 +7,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.SmsBean;
 import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.Template;
+import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.util.MsgConstant;
 import com.jielin.message.util.SortUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -80,5 +81,10 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             log.info("测试环境和本地环境的短信发送：{}", paramDto.toString());
             return true;
         }
+    }
+
+    @Override
+    public boolean supports(Integer handlerType) {
+        return SMS_PUSH.getType() == handlerType;
     }
 }

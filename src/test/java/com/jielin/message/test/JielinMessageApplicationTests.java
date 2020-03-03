@@ -8,7 +8,7 @@ import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.service.ProducerService;
 import com.jielin.message.service.SynMsgPushService;
-import com.jielin.message.synpush.UniPush.UniPushHandler;
+import com.jielin.message.synpush.app.UniPush.UniPushHandler;
 import com.jielin.message.util.MsgConstant;
 import com.taobao.api.ApiException;
 import org.junit.Test;

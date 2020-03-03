@@ -1,4 +1,4 @@
-package com.jielin.message.synpush.UniPush;
+package com.jielin.message.synpush.app.UniPush;
 
 import com.gexin.rp.sdk.base.IAliasResult;
 import com.gexin.rp.sdk.http.IGtPush;
