@@ -24,8 +24,12 @@ public class AsynPushMsgService {
     @RabbitHandler
     @RabbitListener(queues = MsgConstant.PUSH_MSG)
     public void process(ParamDto paramDto) {
+        // 业务处理成功后调用，消息会被确认消费
+        //channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         synMsgPushService.push(paramDto);
         log.info("Receiver  : {}", paramDto.toString());
+        //业务失败后处理
+        //channel.basicReject(message.getMessageProperties().getDeliveryTag(), true);
     }
 
 }
