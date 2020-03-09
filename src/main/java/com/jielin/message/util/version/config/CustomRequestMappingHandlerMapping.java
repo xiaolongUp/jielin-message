@@ -36,4 +36,8 @@ public class CustomRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return new ApiVersionCondition(value);
     }
 
+    @Override
+    public void setInterceptors(Object... interceptors) {
+        super.setInterceptors(interceptors);
+    }
 }
