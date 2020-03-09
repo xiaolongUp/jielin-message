@@ -1,7 +1,7 @@
 package com.jielin.message.service;
 
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

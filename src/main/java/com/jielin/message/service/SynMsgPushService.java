@@ -6,7 +6,6 @@ import com.jielin.message.po.MsgPushPo;
 import com.jielin.message.po.OperatePo;
 import com.jielin.message.po.OperatePoCriteria;
 import com.jielin.message.synpush.MsgPush;
-import com.jielin.message.synpush.sms.SmsMsgPush;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,6 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
 
 /**
  * 同步推送service实现
@@ -37,9 +34,6 @@ public class SynMsgPushService {
 
     @Autowired
     private SettingService settingService;
-
-    @Autowired
-    private SmsMsgPush smsMsgPush;
 
     private List<MsgPush> pushHandlers = new ArrayList<>();
 
@@ -68,20 +62,9 @@ public class SynMsgPushService {
                 //获取需要推送消息的
                 List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
                         PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
-                //当没有配置推送规则时，默认需要推送一条短信
-                if (msgPushes.isEmpty()) {
-                    result = smsMsgPush.pushMsg(paramDto);
-                }
-                //当只配置app推送的时候，同样需要推送一条短信推送
-                if (msgPushes.size() == 1
-                        && msgPushes.get(0).getOptionValue() == APP_PUSH.getType()) {
-                    log.info("推送了一条短信：" + paramDto.toString());
-                    result = smsMsgPush.pushMsg(paramDto);
-
-                }
                 for (MsgPushPo msgPushPo : msgPushes) {
                     for (MsgPush pushHandler : pushHandlers) {
-                        //判断当前的推送方式释放支持
+                        //判断当前的推送方式是否支持
                         boolean supports = pushHandler.supports(msgPushPo.getOptionValue());
                         if (supports) {
                             result = pushHandler.pushMsg(paramDto);

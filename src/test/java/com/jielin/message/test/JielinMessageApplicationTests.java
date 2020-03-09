@@ -9,7 +9,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.service.ProducerService;
 import com.jielin.message.service.SynMsgPushService;
 import com.jielin.message.synpush.app.UniPush.UniPushHandler;
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import com.taobao.api.ApiException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -144,9 +144,9 @@ public class JielinMessageApplicationTests {
                 .setPhoneNumber("18530076638")
                 .setPlatform(0)
                 .setUserType("provider");
-        paramDto.getDingMsg()
+        /*paramDto.getDingMsg()
                 .setDingMsgType("text")
-                .setDingMsgContent("大河哈刚发的户外去哦大1234567890");
+                .setDingMsgContent("大河哈刚发的户外去哦大1234567890");*/
         rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, paramDto);
     }
 

@@ -2,7 +2,7 @@ package com.jielin.message.service;
 
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.util.MessageSendAsync;
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

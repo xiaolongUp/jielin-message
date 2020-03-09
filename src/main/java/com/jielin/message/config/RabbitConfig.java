@@ -1,6 +1,6 @@
 package com.jielin.message.config;
 
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

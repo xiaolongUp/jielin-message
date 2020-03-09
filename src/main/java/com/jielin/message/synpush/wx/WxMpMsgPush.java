@@ -31,8 +31,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
-import static com.jielin.message.util.MsgConstant.PLATFORM_WECHAT_MP;
-import static com.jielin.message.util.MsgConstant.YUEJIE_WECHAT_MP;
+import static com.jielin.message.util.constant.MsgConstant.PLATFORM_WECHAT_MP;
+import static com.jielin.message.util.constant.MsgConstant.YUEJIE_WECHAT_MP;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_MP_PUSH;
 
 /**

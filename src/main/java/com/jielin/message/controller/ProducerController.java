@@ -3,6 +3,7 @@ package com.jielin.message.controller;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponseDto;
 import com.jielin.message.service.ProducerService;
+import com.jielin.message.util.version.annotation.ApiVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,9 +20,17 @@ public class ProducerController {
     private ProducerService producerService;
 
     //生产消息，所有的系统都需要通过http请求调用该接口推送数据
-    @PostMapping(value = "/msg")
+    @PostMapping(value = "/{version}/msg")
+    @ApiVersion()
     public ResponseDto productMsg(@RequestBody @Valid ParamDto paramDto) {
         producerService.send(paramDto);
+        return new ResponseDto();
+    }
+
+    @PostMapping(value = "/{version}/msg")
+    @ApiVersion(2)
+    public ResponseDto productMsgV2(@RequestBody @Valid ParamDto paramDto) {
+//        producerService.send(paramDto);
         return new ResponseDto();
     }
 }

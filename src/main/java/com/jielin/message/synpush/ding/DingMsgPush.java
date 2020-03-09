@@ -11,6 +11,8 @@ import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.synpush.MsgPush;
+import com.jielin.message.util.constant.DingMsgConstant;
+import com.jielin.message.util.enums.DingMsgTypeEnum;
 import com.jielin.message.util.enums.PushTypeEnum;
 import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,10 @@ public class DingMsgPush extends MsgPush {
 
     @Autowired
     private MessageSendLogDao messageSendLogDao;
+
+    private DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.DING_PUSH_MSG_URL);
+
+    private DingTalkClient userClient = new DefaultDingTalkClient(DingtalkConfig.GET_USER_BY_MOBILE_URL);
 
     @Override
     public boolean pushMsg(ParamDto paramDto) throws Exception {
@@ -54,8 +60,6 @@ public class DingMsgPush extends MsgPush {
             return false;
         }
 
-        DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.DING_PUSH_MSG_URL);
-
         OapiMessageCorpconversationAsyncsendV2Request request = new OapiMessageCorpconversationAsyncsendV2Request();
         if (!Optional.ofNullable(userId).isPresent()) {
             return false;
@@ -65,11 +69,26 @@ public class DingMsgPush extends MsgPush {
         request.setToAllUser(false);
 
         OapiMessageCorpconversationAsyncsendV2Request.Msg msg = new OapiMessageCorpconversationAsyncsendV2Request.Msg();
-        switch (paramDto.getDingMsg().getDingMsgType()) {
+        switch ((String) paramDto.getParams().get(DingMsgConstant.DING_MSG_TYPE)) {
             case "text":
-                msg.setMsgtype("text");
+                msg.setMsgtype(DingMsgTypeEnum.TEXT.getType());
                 msg.setText(new OapiMessageCorpconversationAsyncsendV2Request.Text());
-                msg.getText().setContent(paramDto.getDingMsg().getDingMsgContent());
+                msg.getText().setContent((String) paramDto.getParams().get(DingMsgConstant.DING_MSG_CONTENT));
+                request.setMsg(msg);
+                break;
+            case "image":
+                msg.setMsgtype(DingMsgTypeEnum.IMAGE.getType());
+                msg.setImage(new OapiMessageCorpconversationAsyncsendV2Request.Image());
+                msg.getImage().setMediaId((String) paramDto.getParams().get(DingMsgConstant.DING_MEDIA_ID));
+                request.setMsg(msg);
+                break;
+            case "link":
+                msg.setMsgtype(DingMsgTypeEnum.LINK.getType());
+                msg.setLink(new OapiMessageCorpconversationAsyncsendV2Request.Link());
+                msg.getLink().setTitle((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_TITLE));
+                msg.getLink().setText((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_TEXT));
+                msg.getLink().setMessageUrl((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_MESSAGE_URL));
+                msg.getLink().setPicUrl((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_PIC_URL));
                 request.setMsg(msg);
                 break;
             default:
@@ -95,11 +114,11 @@ public class DingMsgPush extends MsgPush {
 
 
     private String getUserId(String mobile) throws ApiException {
-        DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.GET_USER_BY_MOBILE_URL);
+
         OapiUserGetByMobileRequest request = new OapiUserGetByMobileRequest();
         request.setMobile(mobile);
 
-        OapiUserGetByMobileResponse execute = client.execute(request, config.getAccessToken());
+        OapiUserGetByMobileResponse execute = userClient.execute(request, config.getAccessToken());
         return execute.getUserid();
     }
 }

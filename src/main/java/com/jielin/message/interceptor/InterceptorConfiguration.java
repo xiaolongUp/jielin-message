@@ -1,6 +1,6 @@
 package com.jielin.message.interceptor;
 
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

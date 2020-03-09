@@ -8,7 +8,7 @@ import com.jielin.message.dto.SmsBean;
 import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.Template;
 import com.jielin.message.synpush.MsgPush;
-import com.jielin.message.util.MsgConstant;
+import com.jielin.message.util.constant.MsgConstant;
 import com.jielin.message.util.SortUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

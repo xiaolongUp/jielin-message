@@ -30,7 +30,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
-import static com.jielin.message.util.MsgConstant.PLATFORM_WECHAT_OA;
+import static com.jielin.message.util.constant.MsgConstant.PLATFORM_WECHAT_OA;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_NP_PUSH;
 
 /**

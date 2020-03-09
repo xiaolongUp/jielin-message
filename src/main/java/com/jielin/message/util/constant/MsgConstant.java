@@ -1,4 +1,4 @@
-package com.jielin.message.util;
+package com.jielin.message.util.constant;
 
 /**
  * 通用的常量类
