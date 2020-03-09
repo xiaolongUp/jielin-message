@@ -2,11 +2,14 @@ package com.jielin.message.util;
 
 import com.google.gson.Gson;
 import com.jielin.message.dao.mysql.MsgSendResultDao;
+import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.MsgSendResultPo;
+import com.jielin.message.util.constant.MsgConstant;
 import com.jielin.message.util.enums.SendMsgResultEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.connection.PublisherCallbackChannel;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
 
+    private static final String CORRELATION_ID = PublisherCallbackChannel.RETURNED_MESSAGE_CORRELATION_KEY;
 
     private static final SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
 
@@ -30,7 +34,7 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
     /**
      * 通过构造函数注入 RabbitTemplate 依赖
      *
-     * @param rabbitTemplate
+     * @param rabbitTemplate rabbitmq
      */
     @Autowired
     public MessageSendAsync(RabbitTemplate rabbitTemplate, MsgSendResultDao msgSendResultDao, Gson gson) {
@@ -55,15 +59,14 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
         String uid = String.valueOf(idWorker.nextId());
         CorrelationData correlationData = new CorrelationData(uid);
         log.info("ID为: {}", correlationData.getId());
-        //todo 当需要避免重复投递的时候，需要一个唯一id来 标示该消息是否已投递（保证消息的幂等性），暂时未做，幂等性条件无法确定
         MsgSendResultPo po = new MsgSendResultPo();
         po.setCorrelationId(uid);
         po.setContent(gson.toJson(message));
         po.setResult(SendMsgResultEnum.SENDING.getStatus());
+        po.setFailNum(0);
         msgSendResultDao.insert(po);
         // 完成 数据落库，消息状态打标后，就可以安心发送 message
         rabbitTemplate.convertAndSend(exchange, routingKey, message, correlationData);
-
     }
 
 
@@ -76,15 +79,26 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
      */
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-
+        String correlationDataId = correlationData.getId();
+        MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
         if (ack) {
-            log.info("消息投递成功,ID为: {}", correlationData.getId());
-            msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationData.getId());
-            return;
-        }
+            log.info("消息投递成功,ID为: {}", correlationDataId);
+            msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, 0);
+        } else {
+            log.error("消息投递失败,ID为: {},错误信息: {}", correlationDataId, cause);
 
-        log.error("消息投递失败,ID为: {},错误信息: {}", correlationData.getId(), cause);
-        msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(), correlationData.getId());
+            Integer failNum = resultPo.getFailNum();
+            //最多重试投递三次，超过三次后投递到死信队列做后续处理
+            if (failNum >= 3) {
+                rabbitTemplate.convertAndSend("", MsgConstant.FAIL_PUSH_MSG, gson.fromJson(resultPo.getContent(), ParamDto.class), correlationData);
+            }
+            //重试投递
+            else {
+                rabbitTemplate.convertAndSend("", MsgConstant.RETRY_PUSH_MSG, gson.fromJson(resultPo.getContent(), ParamDto.class), correlationData);
+                msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(), correlationDataId, failNum + 1);
+            }
+
+        }
     }
 
     /**
@@ -100,11 +114,12 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
     @Override
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
         // correlationId 就是发消息时设置的 id
-        String correlationId = message.getMessageProperties().getHeaders().get("spring_returned_message_correlation").toString();
-
+        String correlationId = (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
+        MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationId);
         log.error("没有找到对应队列，消息投递失败,ID为: {}, replyCode {} , replyText {}, exchange {} routingKey {}",
                 correlationId, replyCode, replyText, exchange, routingKey);
-        // todo 操作数据库，将 correlationId 这条消息状态改为投递失败
+        msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(),
+                (String) message.getMessageProperties().getHeaders().get(CORRELATION_ID), resultPo.getFailNum() + 1);
     }
 
 

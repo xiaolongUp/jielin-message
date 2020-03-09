@@ -18,8 +18,18 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
 
     @Bean
-    public Queue Queue() {
+    public Queue queue() {
         return new Queue(MsgConstant.PUSH_MSG);
+    }
+
+    @Bean
+    public Queue retryQueue() {
+        return new Queue(MsgConstant.RETRY_PUSH_MSG);
+    }
+
+    @Bean
+    public Queue failQueue() {
+        return new Queue(MsgConstant.FAIL_PUSH_MSG);
     }
 
     /**

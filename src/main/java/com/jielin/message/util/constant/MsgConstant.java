@@ -25,6 +25,16 @@ public class MsgConstant {
     //rabbitMq的消息推送队列名称（此处的消息队列是下单流程的消息推送）
     public static final String PUSH_MSG = "push_msg";
 
+    //rabbitmq的重试消息队列（默认三次）
+    public static final String RETRY_PUSH_MSG = "retry_push_msg";
+
+    //三次重试后还是失败的投递到此消息队列，用来发送邮件或者数据入库
+    public static final String FAIL_PUSH_MSG = "fail_push_msg";
+
+    //
+    public static final String CORRELATION_ID = "spring_returned_message_correlation";
+
+
     //钉钉的消息推送队列
     public static final String DING_PUSH_MSG = "ding_push_msg";
 

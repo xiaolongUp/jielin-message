@@ -147,10 +147,11 @@ CREATE TABLE `jl_msg_third` (
 --投递结果表
 CREATE TABLE `jl_msg_send_result` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `correlation_id` varchar(20) NOT NULL COMMENT '消息的uuid',
-  `message_id` varchar(255) DEFAULT NULL COMMENT '保证幂等性的唯一标示，暂时没用到',
+  `correlation_id` varchar(20) NOT NULL COMMENT '消息唯一id，幂等性保证',
   `content` text NOT NULL COMMENT '投递的消息内容',
   `result` int(2) NOT NULL COMMENT '0:投递中，1:投递成功，2:投递失败',
+  `fail_num` int(2) NOT NULL COMMENT '重新投递的失败次数，超过该次数，投递到死信队列',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `correlation_id` (`correlation_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
