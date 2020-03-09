@@ -29,13 +29,28 @@ public class AsynPushMsgService {
 
     //监听消息队列当中的数据
     @RabbitHandler
-    @RabbitListener(queues = {MsgConstant.PUSH_MSG, MsgConstant.RETRY_PUSH_MSG})
+    @RabbitListener(queues = MsgConstant.PUSH_MSG)
     public void process(ParamDto paramDto, Message message) {
         //获取correlationDataId
         String correlationDataId =
                 (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
         MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
         if (!SendMsgResultEnum.SUCCESS.getStatus().equals(resultPo.getResult())) {
+            synMsgPushService.push(paramDto);
+            msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, resultPo.getFailNum());
+        }
+        log.info("Receiver  : {}", paramDto.toString());
+    }
+
+    //监听消息队重试的消息
+    @RabbitHandler
+    @RabbitListener(queues = MsgConstant.RETRY_PUSH_MSG)
+    public void processRetry(ParamDto paramDto, Message message) {
+        //获取correlationDataId
+        String correlationDataId =
+                (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
+        MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
+        if (!SendMsgResultEnum.SUCCESS.getStatus().equals(resultPo.getResult()) && resultPo.getFailNum() > 0) {
             synMsgPushService.push(paramDto);
             msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, resultPo.getFailNum());
         }
