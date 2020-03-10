@@ -7,6 +7,7 @@ import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
 import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.synpush.app.AppMsgPushHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class JgPushHandler implements AppMsgPushHandler {
      * 给所有的平台和用户都推送消息
      */
     @Override
-    public boolean sendPushAll(ParamDto paramDto) throws APIConnectionException, APIRequestException {
+    public boolean sendPushAll(ParamDto paramDto, OperatePo operatePo) throws APIConnectionException, APIRequestException {
         PushPayload payload = PushPayload.alertAll("test");
         PushResult result = jPushClient.sendPush(payload);
         return result.isResultOK();
@@ -59,8 +60,7 @@ public class JgPushHandler implements AppMsgPushHandler {
      * @param paramDto 参数
      */
     @Override
-    public boolean sendPushToSingle(ParamDto paramDto) throws APIConnectionException, APIRequestException {
-        //todo
+    public boolean sendPushToSingle(ParamDto paramDto, OperatePo operatePo) throws APIConnectionException, APIRequestException {
         //查询出数据库用户所有的客户端的别名
         String[] alias = new String[]{};
         String title = "test";

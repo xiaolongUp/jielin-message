@@ -7,19 +7,19 @@ import com.dingtalk.api.request.OapiUserGetByMobileRequest;
 import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
 import com.dingtalk.api.response.OapiUserGetByMobileResponse;
 import com.jielin.message.config.DingtalkConfig;
-import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.po.MessageSendLog;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.util.constant.DingMsgConstant;
 import com.jielin.message.util.enums.DingMsgTypeEnum;
-import com.jielin.message.util.enums.PushTypeEnum;
 import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+
+import static com.jielin.message.util.enums.PushTypeEnum.DING_PUSH;
 
 @Component("dingMsgPush")
 @Slf4j
@@ -28,43 +28,37 @@ public class DingMsgPush extends MsgPush {
     @Autowired
     private DingtalkConfig config;
 
-    @Autowired
-    private MessageSendLogDao messageSendLogDao;
-
     private DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.DING_PUSH_MSG_URL);
 
     private DingTalkClient userClient = new DefaultDingTalkClient(DingtalkConfig.GET_USER_BY_MOBILE_URL);
 
     @Override
-    public boolean pushMsg(ParamDto paramDto) throws Exception {
-        return push(paramDto);
+    public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        return push(paramDto, operatePo);
     }
 
     @Override
     public boolean supports(Integer handlerType) {
-        return PushTypeEnum.DING_PUSH.getType() == handlerType;
+        return DING_PUSH.getType() == handlerType;
     }
 
     //钉钉推送
-    public boolean push(ParamDto paramDto) throws ApiException {
-        return push(paramDto, true);
+    public boolean push(ParamDto paramDto, OperatePo operatePo) throws ApiException {
+        return push(paramDto, operatePo, true);
     }
 
     //钉钉推送，是否重试
-    public boolean push(ParamDto paramDto, Boolean retry) throws ApiException {
-        String userId = null;
+    public boolean push(ParamDto paramDto, OperatePo operatePo, Boolean retry) throws ApiException {
+
         //获取用户的userId
-        try {
-            userId = getUserId(paramDto.getPhoneNumber());
-        } catch (ApiException e) {
-            return false;
-        }
+        String dingUserId = getDingUserId(paramDto.getPhoneNumber());
 
         OapiMessageCorpconversationAsyncsendV2Request request = new OapiMessageCorpconversationAsyncsendV2Request();
-        if (!Optional.ofNullable(userId).isPresent()) {
+        if (!Optional.ofNullable(dingUserId).isPresent()) {
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, false, "获取用户钉钉id失败!");
             return false;
         }
-        request.setUseridList(userId);
+        request.setUseridList(dingUserId);
         request.setAgentId(config.getAgentId());
         request.setToAllUser(false);
 
@@ -101,19 +95,15 @@ public class DingMsgPush extends MsgPush {
         if (!response.isSuccess() && retry) {
             log.error(response.getErrmsg());
             config.initToken();
-            push(paramDto, false);
+            push(paramDto, operatePo, false);
         }
-        MessageSendLog mongoLog = new MessageSendLog();
-        mongoLog.setUserId(userId)
-                .setOperateType("钉钉推送")
-                .setParams(paramDto.toString())
-                .setResult(response.getBody());
-        messageSendLogDao.insert(mongoLog);
+        super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, response.isSuccess(), response.toString());
+        log.info("correlationId:{},钉钉推送推送结果:{}", paramDto.getCorrelationId(), response.toString());
         return response.isSuccess();
     }
 
 
-    private String getUserId(String mobile) throws ApiException {
+    private String getDingUserId(String mobile) throws ApiException {
 
         OapiUserGetByMobileRequest request = new OapiUserGetByMobileRequest();
         request.setMobile(mobile);

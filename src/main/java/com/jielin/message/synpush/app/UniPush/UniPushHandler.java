@@ -19,7 +19,6 @@ import com.jielin.message.config.AppPushConfig;
 import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.UniPushConfig;
 import com.jielin.message.dao.mongo.MessageSendLogDao;
-import com.jielin.message.dao.mongo.ProviderOrderLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dao.mysql.MsgThirdDao;
 import com.jielin.message.dao.mysql.MsgUserDao;
@@ -43,6 +42,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.util.*;
 
+import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
+
 /**
  * 个推推送的client
  *
@@ -61,9 +62,6 @@ public class UniPushHandler implements AppMsgPushHandler {
     private TemplateFactory templateFactory;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired
-    private ProviderOrderLogDao providerOrderLogDao;
 
     private Map<String, IGtPush> IGtPushMap = new HashMap<>();
 
@@ -98,7 +96,7 @@ public class UniPushHandler implements AppMsgPushHandler {
 
     // 推送通知消息给所有的用户
     @Override
-    public boolean sendPushAll(ParamDto paramDto) throws Exception {
+    public boolean sendPushAll(ParamDto paramDto, OperatePo operatePo) throws Exception {
         Template tmp = templateDao.
                 selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
 
@@ -145,7 +143,7 @@ public class UniPushHandler implements AppMsgPushHandler {
 
     //推送通知消息给单一用户
     @Override
-    public boolean sendPushToSingle(ParamDto paramDto) throws Exception {
+    public boolean sendPushToSingle(ParamDto paramDto, OperatePo operatePo) throws Exception {
 
         String userType = paramDto.getUserType();
         Integer userId = paramDto.getUserId();
@@ -154,15 +152,18 @@ public class UniPushHandler implements AppMsgPushHandler {
         Template tmp = templateDao.
                 selectByOperateAndPushType(paramDto.getOperateType(), PushTypeEnum.APP_PUSH.getType());
         if (!Optional.ofNullable(tmp).isPresent()) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "app模版不存在！");
             return false;
         }
         String appTemplate = templateFactory.newTemplate(paramDto, PushTypeEnum.APP_PUSH.getType(), null);
         if (StringUtils.isBlank(appTemplate)) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "生产app模版失败！");
             return false;
         }
         String uniPushName = paramDto.getUserType().concat(PlatformService.platformMap.get(platform).toString());
         UniPushConfig.UniPush uniPush = config.getUniPush().getUniPushMap().get(uniPushName);
         if (!Optional.ofNullable(uniPush).isPresent()) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "uniPush客户端不存在！");
             return false;
         }
 
@@ -189,6 +190,7 @@ public class UniPushHandler implements AppMsgPushHandler {
                 .andPushTypeEqualTo(PushTypeEnum.APP_PUSH.getType());
         List<MsgThirdPo> msgThirdPos = thirdDao.selectByExample(criteria);
         if (CollectionUtils.isEmpty(msgThirdPos)) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "获取用户别名失败！");
             return false;
         }
         MsgThirdPo msgThird = msgThirdPos.get(0);
@@ -197,13 +199,13 @@ public class UniPushHandler implements AppMsgPushHandler {
                 .addParameter("appType", userType)
                 .addParameter("phone", paramDto.getPhoneNumber())
                 .build().toString();
-        ResponseEntity<ResponsePackDto> authResult = null;
+        ResponseEntity<ResponsePackDto> remoteCall = null;
         //更新用户所在平台的别名
         boolean hasException = false;
         MsgUserPo msgUserPo =
                 msgUserDao.selectByCondition(platform, userType, userId);
         try {
-            authResult = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
+            remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
         } catch (Exception e) {
             //调用接口发生异常时，使用本地存储数据
             hasException = true;
@@ -212,11 +214,12 @@ public class UniPushHandler implements AppMsgPushHandler {
             }
         }
 
-        if (authResult != null && authResult.getStatusCode().equals(HttpStatus.OK) &&
-                null != authResult.getBody()) {
-            if (null != authResult.getBody().getBody()) {
-                alias = (String) authResult.getBody().getBody();
+        if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
+                null != remoteCall.getBody()) {
+            if (null != remoteCall.getBody().getBody()) {
+                alias = (String) remoteCall.getBody().getBody();
                 if (null == msgUserPo) {
+                    //将注册平台绑定的cid写入该系统
                     MsgUserPo record = new MsgUserPo();
                     record.setPlatform(platform);
                     record.setUserType(userType);
@@ -243,21 +246,20 @@ public class UniPushHandler implements AppMsgPushHandler {
             }
         }
         if (StringUtils.isBlank(alias)) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "app别名不存在！");
             return false;
         }
         target.setAlias(alias); //别名需要提前绑定
         IGtPush pushClient = this.IGtPushMap.get(uniPushName);
         if (!Optional.ofNullable(pushClient).isPresent()) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "个推client不存在！");
             return false;
         }
         IPushResult result = pushClient.pushMessageToSingle(message, target);
-        ProviderOrderLog logs = new ProviderOrderLog(alias,
-                PushTypeEnum.APP_PUSH.getDesc(),
-                template.getTransmissionContent());
-        providerOrderLogDao.insert(logs);
-        messageSendLogDao.insert(new MessageSendLog(paramDto, PushTypeEnum.APP_PUSH.getDesc(), gson.toJson(result)));
-        log.info("app推送结果:{}", result.getResponse().toString());
-        return result.getResponse().get("result").equals("ok");
+        boolean resultOk = result.getResponse().get("result").equals("ok");
+        insertMsgSendLog(paramDto, operatePo.getOperateName(), resultOk, gson.toJson(result));
+        log.info("correlationId:{},app推送结果:{}", paramDto.getCorrelationId(), result.getResponse().toString());
+        return resultOk;
 
     }
 
@@ -314,5 +316,7 @@ public class UniPushHandler implements AppMsgPushHandler {
         return template;
     }
 
-
+    private void insertMsgSendLog(ParamDto paramDto, String operateType, Boolean result, String msg) {
+        messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, APP_PUSH.getDesc(), result, msg));
+    }
 }

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.jielin.message.JielinMessageApplication;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.service.ProducerService;
 import com.jielin.message.service.SynMsgPushService;
 import com.jielin.message.synpush.app.UniPush.UniPushHandler;
@@ -128,7 +129,7 @@ public class JielinMessageApplicationTests {
                 .setPhoneNumber("15546049601")
                 .setUserType("provider")
                 .setParams(map);
-        uniPushHandler.sendPushAll(dto);
+        uniPushHandler.sendPushAll(dto,new OperatePo());
     }
 
 

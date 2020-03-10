@@ -1,15 +1,14 @@
 package com.jielin.message.synpush.sms;
 
 import com.jielin.message.config.YunTXSmsConfig;
-import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.SmsBean;
-import com.jielin.message.po.MessageSendLog;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.po.Template;
 import com.jielin.message.synpush.MsgPush;
-import com.jielin.message.util.constant.MsgConstant;
 import com.jielin.message.util.SortUtil;
+import com.jielin.message.util.constant.MsgConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -41,16 +40,13 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
     @Autowired
     private TemplateDao templateDao;
 
-    @Autowired
-    private MessageSendLogDao messageSendLogDao;
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
     }
 
     @Override
-    public boolean pushMsg(ParamDto paramDto) throws Exception {
+    public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
 
         String activeProfile = context.getEnvironment().getActiveProfiles()[0];
 
@@ -58,16 +54,19 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             //当没有该操作类型的短信模版时，直接返回
             Template template = templateDao.selectByOperateAndPushType(paramDto.getOperateType(), SMS_PUSH.getType());
             if (!Optional.ofNullable(template).isPresent()) {
+                super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, false, "短信模版不存在！");
                 return false;
             }
             String smsTemplateId = template.getTmpId();
             if (StringUtils.isBlank(smsTemplateId)) {
+                super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, false, "短信模版id不存在！");
                 return false;
             }
 
             List<String> paramKeys = SortUtil.sortByMapKey(template.getParamMap());
             List<String> params = new ArrayList<>();
             if (paramKeys.isEmpty()) {
+                super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, false, "短信发送的数据未配置！");
                 return false;
             }
             for (String key : paramKeys) {
@@ -75,9 +74,12 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             }
             SmsBean smsBean = yunTXSmsConfig.sendCommonSMS(paramDto.getPhoneNumber(), smsTemplateId,
                     params.toArray(new String[params.size()]));
-            messageSendLogDao.insert(new MessageSendLog(paramDto, SMS_PUSH.getDesc(), smsBean.getMessage()));
+
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, smsBean.getIsSuccess(), smsBean.getMessage());
+            log.info("correlationId:{},短信推送结果:{}", paramDto.getCorrelationId(), smsBean.getMessage());
             return smsBean.getIsSuccess();
         } else {
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, true, "测试环境发送短信！");
             log.info("测试环境和本地环境的短信发送：{}", paramDto.toString());
             return true;
         }

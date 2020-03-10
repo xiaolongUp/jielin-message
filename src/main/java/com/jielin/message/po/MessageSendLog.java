@@ -1,7 +1,6 @@
 package com.jielin.message.po;
 
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.util.enums.OperateTypeEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -26,6 +25,9 @@ public class MessageSendLog implements Serializable {
     //唯一标识
     private String _id;
 
+    //消息的唯一标识
+    private String correlationId;
+
     //插入时间
     private Date operateTime = new Date();
 
@@ -41,18 +43,23 @@ public class MessageSendLog implements Serializable {
     //推送类型
     private String pushType;
 
-    //params
-    private String params;
+    //推送是否成功
+    private Boolean result;
 
     //推送结果
-    private String result;
+    private String resultMsg;
 
-    public MessageSendLog(ParamDto paramDto,String pushType, String result) {
+    public MessageSendLog(ParamDto paramDto, String operateType, String pushType, String resultMsg) {
+        this.correlationId = paramDto.getCorrelationId();
         this.userId = paramDto.getUserId().toString();
         this.phone = paramDto.getPhoneNumber();
-        this.operateType = OperateTypeEnum.getDescByType(paramDto.getOperateType());
+        this.operateType = operateType;
         this.pushType = pushType;
-        this.params = paramDto.toString();
+        this.resultMsg = resultMsg;
+    }
+
+    public MessageSendLog(ParamDto paramDto, String operateType, String pushType, Boolean result, String resultMsg) {
+        this(paramDto, operateType, pushType, resultMsg);
         this.result = result;
     }
 }

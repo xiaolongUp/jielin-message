@@ -36,6 +36,7 @@ public class AsynPushMsgService {
                 (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
         MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
         if (!SendMsgResultEnum.SUCCESS.getStatus().equals(resultPo.getResult())) {
+            paramDto.setCorrelationId(correlationDataId);
             synMsgPushService.push(paramDto);
             msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, resultPo.getFailNum());
         }
@@ -51,6 +52,7 @@ public class AsynPushMsgService {
                 (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
         MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
         if (!SendMsgResultEnum.SUCCESS.getStatus().equals(resultPo.getResult()) && resultPo.getFailNum() > 0) {
+            paramDto.setCorrelationId(correlationDataId);
             synMsgPushService.push(paramDto);
             msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, resultPo.getFailNum());
         }

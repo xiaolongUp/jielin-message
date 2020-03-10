@@ -1,7 +1,6 @@
 package com.jielin.message.dao.mongo;
 
 import com.jielin.message.po.MessageSendLog;
-import com.jielin.message.po.OperateLog;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 

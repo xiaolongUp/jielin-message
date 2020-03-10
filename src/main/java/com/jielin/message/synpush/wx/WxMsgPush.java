@@ -2,16 +2,13 @@ package com.jielin.message.synpush.wx;
 
 import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.WeChatConfig;
-import com.jielin.message.dao.mongo.MessageSendLogDao;
-import com.jielin.message.dao.mongo.OperateLogDao;
 import com.jielin.message.dao.mysql.MsgUserDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.dto.TemplateMsgResult;
-import com.jielin.message.po.MessageSendLog;
 import com.jielin.message.po.MsgUserPo;
 import com.jielin.message.po.MsgUserPoCriteria;
-import com.jielin.message.po.OperateLog;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.util.TemplateFactory;
 import com.jielin.message.util.enums.ThirdActionEnum;
@@ -31,6 +28,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
 import static com.jielin.message.util.constant.MsgConstant.PLATFORM_WECHAT_OA;
+import static com.jielin.message.util.enums.PushTypeEnum.WX_MP_PUSH;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_NP_PUSH;
 
 /**
@@ -46,9 +44,6 @@ public class WxMsgPush extends MsgPush {
     private RestTemplate restTemplate;
 
     @Autowired
-    protected OperateLogDao operateLogDao;
-
-    @Autowired
     RedisTemplate redisTemplate;
 
     @Autowired
@@ -61,9 +56,6 @@ public class WxMsgPush extends MsgPush {
     private ThirdApiConfig thirdApiConfig;
 
     @Autowired
-    private MessageSendLogDao messageSendLogDao;
-
-    @Autowired
     private MsgUserDao msgUserDao;
 
     private static HttpHeaders headers = new HttpHeaders();
@@ -74,7 +66,7 @@ public class WxMsgPush extends MsgPush {
     }
 
     @Override
-    public boolean pushMsg(ParamDto paramDto) throws Exception {
+    public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
         String userType = paramDto.getUserType();
         Integer userId = paramDto.getUserId();
         Integer platform = paramDto.getPlatform();
@@ -88,11 +80,11 @@ public class WxMsgPush extends MsgPush {
                 .build().toString();
 
         String openid = null;
-        ResponseEntity<ResponsePackDto> authResult = null;
+        ResponseEntity<ResponsePackDto> remoteCall = null;
         MsgUserPo msgUserPo =
                 msgUserDao.selectByCondition(platform, userType, userId);
         try {
-            authResult
+            remoteCall
                     = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
         } catch (Exception e) {
             log.error("获取微信小程序openid接口异常:{}", e.getMessage());
@@ -102,12 +94,12 @@ public class WxMsgPush extends MsgPush {
             }
         }
 
-        if (null != authResult && null != authResult.getBody() && authResult.getBody().getStatus() == 3) {
-            this.pushMsg(paramDto);
-        } else if (null != authResult && authResult.getStatusCode().equals(HttpStatus.OK) &&
-                null != authResult.getBody()) {
-            if (null != authResult.getBody().getBody()) {
-                HashMap map = (HashMap) authResult.getBody().getBody();
+        if (null != remoteCall && null != remoteCall.getBody() && remoteCall.getBody().getStatus() == 3) {
+            this.pushMsg(paramDto, operatePo);
+        } else if (null != remoteCall && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
+                null != remoteCall.getBody()) {
+            if (null != remoteCall.getBody().getBody()) {
+                HashMap map = (HashMap) remoteCall.getBody().getBody();
                 openid = (String) map.get("openid");
                 if (null == msgUserPo) {
                     MsgUserPo record = new MsgUserPo();
@@ -135,33 +127,34 @@ public class WxMsgPush extends MsgPush {
                 openid = msgUserPo.getWxGzhOpenid();
             }
         }
-        if (StringUtils.isNotBlank(openid)) {
-            //获取发送的模版数据
-            String data = templateFactory.newTemplate(paramDto, WX_NP_PUSH.getType(), openid);
-            if (StringUtils.isBlank(data)) {
-                return false;
-            }
-            UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.PUSH_TEMPLATE_MSG_URL)
-                    .queryParam("access_token", wechatTokenHelper.getToken(true)).build();
-            TemplateMsgResult templateMsgResult = restTemplate.exchange(builder.toUriString(),
-                    HttpMethod.POST,
-                    new HttpEntity<>(data, headers),
-                    TemplateMsgResult.class).getBody();
-            if (templateMsgResult.getErrcode() == 40001) {
-                UriComponents retry = UriComponentsBuilder.fromHttpUrl(WeChatConfig.PUSH_TEMPLATE_MSG_URL)
-                        .queryParam("access_token", wechatTokenHelper.getToken(false)).build();
-                templateMsgResult = restTemplate.exchange(retry.toUriString(),
-                        HttpMethod.POST,
-                        new HttpEntity<>(data, headers),
-                        TemplateMsgResult.class).getBody();
-            } else if (templateMsgResult.getErrcode() != 0) {
-                operateLogDao.insert(new OperateLog(templateMsgResult));
-            }
-            //当access_token无效时刷新缓存数据
-            log.info("微信公众号推送结果：{}", templateMsgResult.toString());
-            messageSendLogDao.insert(new MessageSendLog(paramDto, WX_NP_PUSH.getDesc(), templateMsgResult.toString()));
-            result = templateMsgResult.getErrcode() == 0;
+        if (StringUtils.isBlank(openid)) {
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), WX_MP_PUSH, false, "微信公众号openid不存在！");
+            return false;
         }
+        //获取发送的模版数据
+        String template = templateFactory.newTemplate(paramDto, WX_NP_PUSH.getType(), openid);
+        if (StringUtils.isBlank(template)) {
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), WX_NP_PUSH, false, "微信公众号模版不存在！");
+            return false;
+        }
+        UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.PUSH_TEMPLATE_MSG_URL)
+                .queryParam("access_token", wechatTokenHelper.getToken(true)).build();
+        TemplateMsgResult templateMsgResult = restTemplate.exchange(builder.toUriString(),
+                HttpMethod.POST,
+                new HttpEntity<>(template, headers),
+                TemplateMsgResult.class).getBody();
+        if (templateMsgResult.getErrcode() == 40001) {
+            UriComponents retry = UriComponentsBuilder.fromHttpUrl(WeChatConfig.PUSH_TEMPLATE_MSG_URL)
+                    .queryParam("access_token", wechatTokenHelper.getToken(false)).build();
+            templateMsgResult = restTemplate.exchange(retry.toUriString(),
+                    HttpMethod.POST,
+                    new HttpEntity<>(template, headers),
+                    TemplateMsgResult.class).getBody();
+        }
+        //当access_token无效时刷新缓存数据
+        log.info("微信公众号推送结果：{}", templateMsgResult.toString());
+        result = templateMsgResult.getErrcode() == 0;
+        super.insertMsgSendLog(paramDto, operatePo.getOperateName(), WX_NP_PUSH, result, templateMsgResult.toString());
         return result;
     }
 

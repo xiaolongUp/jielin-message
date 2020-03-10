@@ -39,6 +39,9 @@ public class ParamDto implements Serializable {
     @NotBlank(message = "用户类型不能为空，悦管家平台悦姐：provider，用户：customer")
     private String userType;
 
+    //消息的唯一标识（消息队列生成的全局唯一）
+    private String correlationId;
+
     //需要的参数
     private Map<String, Object> params;
 }

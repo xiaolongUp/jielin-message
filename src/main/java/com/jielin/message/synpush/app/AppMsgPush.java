@@ -1,6 +1,7 @@
 package com.jielin.message.synpush.app;
 
 import com.jielin.message.dto.ParamDto;
+import com.jielin.message.po.OperatePo;
 import com.jielin.message.synpush.MsgPush;
 import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,8 @@ public class AppMsgPush extends MsgPush {
     private AppMsgPushHandler appMsgPushHandler;
 
     @Override
-    public boolean pushMsg(ParamDto paramDto) throws Exception {
-        return appMsgPushHandler.sendPushToSingle(paramDto);
+    public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        return appMsgPushHandler.sendPushToSingle(paramDto, operatePo);
     }
 
     @Override
