@@ -6,6 +6,7 @@ import com.dingtalk.api.request.OapiMessageCorpconversationAsyncsendV2Request;
 import com.dingtalk.api.request.OapiUserGetByMobileRequest;
 import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
 import com.dingtalk.api.response.OapiUserGetByMobileResponse;
+import com.google.gson.Gson;
 import com.jielin.message.config.DingtalkConfig;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.OperatePo;
@@ -27,6 +28,9 @@ public class DingMsgPush extends MsgPush {
 
     @Autowired
     private DingtalkConfig config;
+
+    @Autowired
+    private Gson gson;
 
     private DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.DING_PUSH_MSG_URL);
 
@@ -97,8 +101,8 @@ public class DingMsgPush extends MsgPush {
             config.initToken();
             push(paramDto, operatePo, false);
         }
-        super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, response.isSuccess(), response.toString());
-        log.info("correlationId:{},钉钉推送推送结果:{}", paramDto.getCorrelationId(), response.toString());
+        super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, response.isSuccess(), gson.toJson(response));
+        log.info("correlationId:{},钉钉推送推送结果:{}", paramDto.getCorrelationId(), gson.toJson(response));
         return response.isSuccess();
     }
 
