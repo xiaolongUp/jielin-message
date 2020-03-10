@@ -23,12 +23,16 @@ public class WebMvcConfig extends WebMvcConfigurationSupport implements Applicat
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
         CustomRequestMappingHandlerMapping mappingHandlerMapping = new CustomRequestMappingHandlerMapping();
-        Object[] objects = {accessInterceptor};
-        mappingHandlerMapping.setInterceptors(objects);
+        String activeProfile = super.getApplicationContext().getEnvironment().getActiveProfiles()[0];
+        if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)
+                || MsgConstant.TEST_PROFILE.equalsIgnoreCase(activeProfile)) {
+//            Object[] objects = {accessInterceptor};
+//            mappingHandlerMapping.setInterceptors(objects);
+        }
         return mappingHandlerMapping;
     }
 
-    //当测试环境和正式环境需要设置调用白名单
+    //当测试环境和正式环境需要设置调用白名单，使用spring自带RequestMappingHandlerMapping时生效
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         String activeProfile = super.getApplicationContext().getEnvironment().getActiveProfiles()[0];
