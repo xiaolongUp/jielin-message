@@ -48,6 +48,11 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
 
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(SMS_PUSH);
+        super.localParamDto.set(list);
         String activeProfile = context.getEnvironment().getActiveProfiles()[0];
 
         if (MsgConstant.PROD_PROFILE.equalsIgnoreCase(activeProfile)) {
@@ -80,7 +85,7 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             return smsBean.getIsSuccess();
         } else {
             super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, true, "测试环境发送短信！");
-            log.info("测试环境和本地环境的短信发送：{}", paramDto.toString());
+            log.info("correlationId:{},测试环境和本地环境的短信发送：{}", paramDto.getCorrelationId(), paramDto.toString());
             return true;
         }
     }

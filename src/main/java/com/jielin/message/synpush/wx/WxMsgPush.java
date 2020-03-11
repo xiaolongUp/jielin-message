@@ -25,10 +25,11 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.jielin.message.util.constant.MsgConstant.PLATFORM_WECHAT_OA;
-import static com.jielin.message.util.enums.PushTypeEnum.WX_MP_PUSH;
 import static com.jielin.message.util.enums.PushTypeEnum.WX_NP_PUSH;
 
 /**
@@ -67,11 +68,15 @@ public class WxMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(WX_NP_PUSH);
+        super.localParamDto.set(list);
         String userType = paramDto.getUserType();
         Integer userId = paramDto.getUserId();
         Integer platform = paramDto.getPlatform();
-        boolean hasException = false;
-        boolean result = false;
+        boolean result;
 
         String authUrl = thirdApiConfig.getJlWebApiUrl() + ThirdActionEnum.JL_WEB_AUTH_MEMBER.getActionName();
         String authBuilder = new URIBuilder(authUrl)
@@ -80,19 +85,11 @@ public class WxMsgPush extends MsgPush {
                 .build().toString();
 
         String openid = null;
-        ResponseEntity<ResponsePackDto> remoteCall = null;
+        ResponseEntity<ResponsePackDto> remoteCall;
         MsgUserPo msgUserPo =
                 msgUserDao.selectByCondition(platform, userType, userId);
-        try {
-            remoteCall
-                    = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
-        } catch (Exception e) {
-            log.error("获取微信小程序openid接口异常:{}", e.getMessage());
-            hasException = true;
-            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getWxGzhOpenid())) {
-                openid = msgUserPo.getWxGzhOpenid();
-            }
-        }
+        remoteCall
+                = restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
 
         if (null != remoteCall && null != remoteCall.getBody() && remoteCall.getBody().getStatus() == 3) {
             this.pushMsg(paramDto, operatePo);
@@ -121,14 +118,14 @@ public class WxMsgPush extends MsgPush {
             }
         }
         //当调用接口没有发生异常且接口没有返回数据时，重试使用本地的存储数据
-        if (StringUtils.isBlank(openid) && !hasException) {
+        if (StringUtils.isBlank(openid)) {
 
             if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
                 openid = msgUserPo.getWxGzhOpenid();
             }
         }
         if (StringUtils.isBlank(openid)) {
-            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), WX_MP_PUSH, false, "微信公众号openid不存在！");
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), WX_NP_PUSH, false, "微信公众号openid不存在！");
             return false;
         }
         //获取发送的模版数据

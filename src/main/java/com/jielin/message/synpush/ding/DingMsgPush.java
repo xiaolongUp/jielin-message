@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.jielin.message.util.enums.PushTypeEnum.DING_PUSH;
@@ -38,6 +40,11 @@ public class DingMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(DING_PUSH);
+        super.localParamDto.set(list);
         return push(paramDto, operatePo);
     }
 

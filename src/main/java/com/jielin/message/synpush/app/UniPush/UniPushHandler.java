@@ -201,18 +201,9 @@ public class UniPushHandler implements AppMsgPushHandler {
                 .build().toString();
         ResponseEntity<ResponsePackDto> remoteCall = null;
         //更新用户所在平台的别名
-        boolean hasException = false;
         MsgUserPo msgUserPo =
                 msgUserDao.selectByCondition(platform, userType, userId);
-        try {
-            remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
-        } catch (Exception e) {
-            //调用接口发生异常时，使用本地存储数据
-            hasException = true;
-            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
-                alias = msgUserPo.getUniappAlias();
-            }
-        }
+        remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
 
         if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
                 null != remoteCall.getBody()) {
@@ -239,7 +230,7 @@ public class UniPushHandler implements AppMsgPushHandler {
             }
         }
         //当调用接口没有发生异常且接口没有返回数据时，重试使用本地的存储数据
-        if (StringUtils.isBlank(alias) && !hasException) {
+        if (StringUtils.isBlank(alias)) {
 
             if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
                 alias = msgUserPo.getUniappAlias();

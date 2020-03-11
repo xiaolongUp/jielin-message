@@ -26,7 +26,9 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.jielin.message.util.constant.MsgConstant.PLATFORM_WECHAT_MP;
 import static com.jielin.message.util.constant.MsgConstant.YUEJIE_WECHAT_MP;
@@ -68,11 +70,15 @@ public class WxMpMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(WX_MP_PUSH);
+        super.localParamDto.set(list);
         String userType = paramDto.getUserType();
         Integer userId = paramDto.getUserId();
         Integer platform = paramDto.getPlatform();
-        boolean result = false;
-        boolean hasException = false;
+        boolean result;
         String wxPlatform;
         //悦姐小程序
         if (paramDto.getUserType().equals(UserTypeEnum.PROVIDER.getType())) {
@@ -88,20 +94,13 @@ public class WxMpMsgPush extends MsgPush {
                 .addParameter("customId", paramDto.getUserId().toString())
                 .addParameter("platform", wxPlatform)
                 .build().toString();
-        ResponseEntity<ResponsePackDto> authResult = null;
+        ResponseEntity<ResponsePackDto> authResult;
         String openid = null;
         MsgUserPo msgUserPo =
                 msgUserDao.selectByCondition(platform, userType, userId);
-        try {
-            authResult =
-                    restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
-        } catch (Exception e) {
-            log.error("获取微信小程序openid接口异常:{}", e.getMessage());
-            hasException = true;
-            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getWxMpOpenid())) {
-                openid = msgUserPo.getWxMpOpenid();
-            }
-        }
+
+        authResult =
+                restTemplate.exchange(authBuilder, ThirdActionEnum.JL_WEB_AUTH_MEMBER.getRequestType(), null, ResponsePackDto.class);
 
         if (null != authResult && null != authResult.getBody() && authResult.getBody().getStatus() == 3) {
             this.pushMsg(paramDto, operatePo);
@@ -130,7 +129,7 @@ public class WxMpMsgPush extends MsgPush {
             }
         }
         //当调用接口没有发生异常且接口没有返回数据时，重试使用本地的存储数据
-        if (StringUtils.isBlank(openid) && !hasException) {
+        if (StringUtils.isBlank(openid)) {
 
             if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
                 openid = msgUserPo.getWxMpOpenid();

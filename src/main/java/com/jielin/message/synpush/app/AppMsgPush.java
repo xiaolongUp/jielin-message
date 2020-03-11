@@ -8,6 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
+
 /**
  * app推送，采用极光推送实现
  *
@@ -22,6 +27,11 @@ public class AppMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(APP_PUSH);
+        super.localParamDto.set(list);
         return appMsgPushHandler.sendPushToSingle(paramDto, operatePo);
     }
 

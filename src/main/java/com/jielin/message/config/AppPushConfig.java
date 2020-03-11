@@ -8,7 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 /**
  * app推送配置类
@@ -30,8 +35,10 @@ public class AppPushConfig {
 
 
     @Bean
-    public RestTemplate restTemplate(){
-        return new RestTemplate();
+    public RestTemplate restTemplate(ResponseErrorHandler responseErrorHandler) {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(responseErrorHandler);
+        return restTemplate;
     }
 
 
@@ -41,5 +48,27 @@ public class AppPushConfig {
     @ConditionalOnMissingBean(AppMsgPushHandler.class)
     public UniPushHandler uniPushHandler() {
         return new UniPushHandler();
+    }
+
+    @Bean
+    public ResponseErrorHandler responseErrorHandler() {
+        return new ResponseErrorHandler() {
+
+            @Override
+            public boolean hasError(ClientHttpResponse response) throws IOException {
+                boolean hasError = false;
+                if (response.getStatusCode() != HttpStatus.OK) {
+                    hasError = true;
+                }
+                return hasError;
+            }
+
+            @Override
+            public void handleError(ClientHttpResponse response) throws IOException {
+                if (response.getStatusCode() != HttpStatus.OK) {
+                    throw new RuntimeException("restTemplate调用接口异常：" + response.getStatusCode().toString());
+                }
+            }
+        };
     }
 }
