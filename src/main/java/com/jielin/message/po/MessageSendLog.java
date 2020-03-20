@@ -25,6 +25,9 @@ public class MessageSendLog implements Serializable {
     //唯一标识
     private String _id;
 
+    //业务系统的消息唯一标实,用来查询消息是否投递成功
+    private String msgId;
+
     //消息的唯一标识
     private String correlationId;
 
@@ -50,6 +53,7 @@ public class MessageSendLog implements Serializable {
     private String resultMsg;
 
     public MessageSendLog(ParamDto paramDto, String operateType, String pushType, String resultMsg) {
+        this.msgId = paramDto.getMsgId();
         this.correlationId = paramDto.getCorrelationId();
         this.userId = paramDto.getUserId().toString();
         this.phone = paramDto.getPhoneNumber();

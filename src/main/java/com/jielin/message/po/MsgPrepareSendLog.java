@@ -20,6 +20,9 @@ public class MsgPrepareSendLog implements Serializable {
     //唯一标识
     private String _id;
 
+    //业务系统的消息唯一标实,用来查询消息是否投递成功
+    private String msgId;
+
     //消息的唯一标识
     private String correlationId;
 
