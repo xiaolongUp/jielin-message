@@ -43,6 +43,9 @@ public class MessageSendLog implements Serializable {
     //操作类型
     private String operateType;
 
+    //平台
+    private String platform;
+
     //推送类型
     private String pushType;
 
@@ -64,6 +67,7 @@ public class MessageSendLog implements Serializable {
 
     public MessageSendLog(ParamDto paramDto, String operateType, String pushType, Boolean result, String resultMsg) {
         this(paramDto, operateType, pushType, resultMsg);
+        this.platform = paramDto.getPlatform().toString();
         this.result = result;
     }
 }

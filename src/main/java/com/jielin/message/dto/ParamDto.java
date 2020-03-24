@@ -20,7 +20,6 @@ public class ParamDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     //用户id
-    @NotNull(message = "用户id不能为空")
     private Integer userId;
 
     //来自哪个平台（悦管家平台，悦所平台等）
@@ -36,7 +35,6 @@ public class ParamDto implements Serializable {
     private String phoneNumber;
 
     //用户类型
-    @NotBlank(message = "用户类型不能为空，悦管家平台悦姐：provider，用户：customer")
     private String userType;
 
     //各系统生成的唯一消息标实
