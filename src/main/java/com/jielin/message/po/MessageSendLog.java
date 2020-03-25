@@ -58,7 +58,9 @@ public class MessageSendLog implements Serializable {
     public MessageSendLog(ParamDto paramDto, String operateType, String pushType, String resultMsg) {
         this.msgId = paramDto.getMsgId();
         this.correlationId = paramDto.getCorrelationId();
-        this.userId = paramDto.getUserId().toString();
+        if (null != paramDto.getUserId()) {
+            this.userId = paramDto.getUserId().toString();
+        }
         this.phone = paramDto.getPhoneNumber();
         this.operateType = operateType;
         this.pushType = pushType;
@@ -67,7 +69,9 @@ public class MessageSendLog implements Serializable {
 
     public MessageSendLog(ParamDto paramDto, String operateType, String pushType, Boolean result, String resultMsg) {
         this(paramDto, operateType, pushType, resultMsg);
-        this.platform = paramDto.getPlatform().toString();
+        if (null != paramDto.getPlatform()) {
+            this.platform = paramDto.getPlatform().toString();
+        }
         this.result = result;
     }
 }
