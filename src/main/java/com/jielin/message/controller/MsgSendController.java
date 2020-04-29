@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("msg")
+@RequestMapping("/msg")
 public class MsgSendController {
 
     @Autowired
@@ -18,9 +18,10 @@ public class MsgSendController {
 
 
     @ApiVersion()
-    @GetMapping(value = "/{version}/result/{id}")
-    public List<MessageSendLog> getResult(@PathVariable String msgId,
-                                          @RequestParam("platform") Integer platform, @RequestParam("operateType") Integer operateType) {
+    @GetMapping(value = "/{version}/result")
+    public List<MessageSendLog> getResult(@RequestParam("msgId") String msgId,
+                                          @RequestParam("platform") Integer platform,
+                                          @RequestParam(value = "operateType", required = false) Integer operateType) {
         return messageSendLogDao.getByParams(msgId, platform, operateType);
     }
 

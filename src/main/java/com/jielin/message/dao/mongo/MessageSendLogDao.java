@@ -22,8 +22,10 @@ public class MessageSendLogDao extends BaseDao<MessageSendLog> {
 
     public List<MessageSendLog> getByParams(String msgId, Integer platform, Integer operateType) {
         Criteria criteria = Criteria.where("msgId").is(msgId)
-                .and("operateType").is(operateType.toString())
                 .and("platform").is(platform.toString());
+        if (operateType != null) {
+            criteria.and("operateId").is(operateType);
+        }
         Query query = new Query(criteria);
         return mongoTemplate.find(query, getClz());
     }
