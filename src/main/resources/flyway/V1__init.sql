@@ -1,7 +1,7 @@
 CREATE TABLE `jl_msg_push` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dsc` varchar(50) NOT NULL COMMENT '名称描述',
-  `operate_type` tinyint(4) NOT NULL COMMENT '操作类型：jl_msg_operate主键',
+  `operate_type` int(8) NOT NULL COMMENT '操作类型：jl_msg_operate主键',
   `option_value` tinyint(4) NOT NULL COMMENT '需要哪些推送：jl_msg_option主键',
   `platform` tinyint(4) NOT NULL COMMENT '平台，悦管家平台，jl_msg_platform主键',
   `user_type` varchar(50) DEFAULT NULL COMMENT '用户类型，provider，customer',
@@ -36,7 +36,7 @@ CREATE TABLE `jl_msg_menu` (
 CREATE TABLE `jl_msg_operate` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `operate_name` varchar(50) NOT NULL COMMENT '操作名称',
-  `operate_type` tinyint(4) NOT NULL COMMENT '操作类型code，所有的系统需要统一',
+  `operate_type` int(8) NOT NULL COMMENT '操作类型code，所有的系统需要统一',
   `enable` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
   `push_all` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否所有的推送方式都推送',
   `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',

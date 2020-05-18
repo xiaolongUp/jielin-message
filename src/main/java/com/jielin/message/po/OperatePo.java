@@ -29,7 +29,7 @@ public class OperatePo implements Serializable {
      *
      * @mbg.generated Mon Nov 04 15:12:57 CST 2019
      */
-    private Byte operateType;
+    private Integer operateType;
 
     /**
      *
@@ -153,7 +153,7 @@ public class OperatePo implements Serializable {
      *
      * @mbg.generated Mon Nov 04 15:12:57 CST 2019
      */
-    public Byte getOperateType() {
+    public Integer getOperateType() {
         return operateType;
     }
 
@@ -163,7 +163,7 @@ public class OperatePo implements Serializable {
      *
      * @mbg.generated Mon Nov 04 15:12:57 CST 2019
      */
-    public OperatePo withOperateType(Byte operateType) {
+    public OperatePo withOperateType(Integer operateType) {
         this.setOperateType(operateType);
         return this;
     }
@@ -176,7 +176,7 @@ public class OperatePo implements Serializable {
      *
      * @mbg.generated Mon Nov 04 15:12:57 CST 2019
      */
-    public void setOperateType(Byte operateType) {
+    public void setOperateType(Integer operateType) {
         this.operateType = operateType;
     }
 

@@ -9,7 +9,7 @@
     -->
     <result column="id" jdbcType="INTEGER" property="id" />
     <result column="operate_name" jdbcType="VARCHAR" property="operateName" />
-    <result column="operate_type" jdbcType="TINYINT" property="operateType" />
+    <result column="operate_type" jdbcType="INTEGER" property="operateType" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="enable" jdbcType="BIT" property="enable" />
@@ -172,7 +172,7 @@
         #{operateName,jdbcType=VARCHAR},
       </if>
       <if test="operateType != null">
-        #{operateType,jdbcType=TINYINT},
+        #{operateType,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -214,7 +214,7 @@
         operate_name = #{record.operateName,jdbcType=VARCHAR},
       </if>
       <if test="record.operateType != null">
-        operate_type = #{record.operateType,jdbcType=TINYINT},
+        operate_type = #{record.operateType,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -242,7 +242,7 @@
     update jl_msg_operate
     set id = #{record.id,jdbcType=INTEGER},
       operate_name = #{record.operateName,jdbcType=VARCHAR},
-      operate_type = #{record.operateType,jdbcType=TINYINT},
+      operate_type = #{record.operateType,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       enable = #{record.enable,jdbcType=BIT},

@@ -8,9 +8,12 @@ import com.dingtalk.api.response.OapiMessageCorpconversationAsyncsendV2Response;
 import com.dingtalk.api.response.OapiUserGetByMobileResponse;
 import com.google.gson.Gson;
 import com.jielin.message.config.DingtalkConfig;
+import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.OperatePo;
+import com.jielin.message.po.Template;
 import com.jielin.message.synpush.MsgPush;
+import com.jielin.message.util.TemplateFactory;
 import com.jielin.message.util.constant.DingMsgConstant;
 import com.jielin.message.util.enums.DingMsgTypeEnum;
 import com.taobao.api.ApiException;
@@ -33,6 +36,12 @@ public class DingMsgPush extends MsgPush {
 
     @Autowired
     private Gson gson;
+
+    @Autowired
+    private TemplateDao templateDao;
+
+    @Autowired
+    private TemplateFactory templateFactory;
 
     private DingTalkClient client = new DefaultDingTalkClient(DingtalkConfig.DING_PUSH_MSG_URL);
 
@@ -73,12 +82,18 @@ public class DingMsgPush extends MsgPush {
         request.setAgentId(config.getAgentId());
         request.setToAllUser(false);
 
+        Template template = templateDao.selectByOperateAndPushType(paramDto.getOperateType(), DING_PUSH.getType());
+        if (template == null) {
+            super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, false, "未配置该类型消息钉钉模版!");
+            return false;
+        }
+        String newTemplate = templateFactory.newTemplate(paramDto, DING_PUSH.getType(), null);
         OapiMessageCorpconversationAsyncsendV2Request.Msg msg = new OapiMessageCorpconversationAsyncsendV2Request.Msg();
         switch ((String) paramDto.getParams().get(DingMsgConstant.DING_MSG_TYPE)) {
             case "text":
                 msg.setMsgtype(DingMsgTypeEnum.TEXT.getType());
                 msg.setText(new OapiMessageCorpconversationAsyncsendV2Request.Text());
-                msg.getText().setContent((String) paramDto.getParams().get(DingMsgConstant.DING_MSG_CONTENT));
+                msg.getText().setContent(newTemplate);
                 request.setMsg(msg);
                 break;
             case "image":
@@ -94,6 +109,23 @@ public class DingMsgPush extends MsgPush {
                 msg.getLink().setText((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_TEXT));
                 msg.getLink().setMessageUrl((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_MESSAGE_URL));
                 msg.getLink().setPicUrl((String) paramDto.getParams().get(DingMsgConstant.DING_LINK_PIC_URL));
+                request.setMsg(msg);
+                break;
+            case "action_card":
+                msg.setMsgtype(DingMsgTypeEnum.CARD.getType());
+                OapiMessageCorpconversationAsyncsendV2Request.ActionCard card = new OapiMessageCorpconversationAsyncsendV2Request.ActionCard();
+                List<OapiMessageCorpconversationAsyncsendV2Request.BtnJsonList> btns = new ArrayList<>();
+                OapiMessageCorpconversationAsyncsendV2Request.BtnJsonList btn = new OapiMessageCorpconversationAsyncsendV2Request.BtnJsonList();
+                btns.add(btn);
+                btn.setActionUrl((String) paramDto.getParams().get(DingMsgConstant.DING_CARD_ACTION_URL));
+                String s = "**营业额：**%s<br>**异常数：**%s";
+
+                btn.setTitle((String) paramDto.getParams().get(DingMsgConstant.DING_CARD_BTN_TITLE));
+                card.setBtnJsonList(btns);
+                card.setBtnOrientation("1");
+                card.setMarkdown(newTemplate);
+                card.setTitle((String) paramDto.getParams().get(DingMsgConstant.DING_CARD_TITLE));
+                msg.setActionCard(card);
                 request.setMsg(msg);
                 break;
             default:

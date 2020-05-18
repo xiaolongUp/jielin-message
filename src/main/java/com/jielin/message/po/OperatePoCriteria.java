@@ -340,37 +340,37 @@ public class OperatePoCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeNotEqualTo(Byte value) {
+        public Criteria andOperateTypeNotEqualTo(Integer value) {
             addCriterion("operate_type <>", value, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeGreaterThan(Byte value) {
+        public Criteria andOperateTypeGreaterThan(Integer value) {
             addCriterion("operate_type >", value, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeGreaterThanOrEqualTo(Byte value) {
+        public Criteria andOperateTypeGreaterThanOrEqualTo(Integer value) {
             addCriterion("operate_type >=", value, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeLessThan(Byte value) {
+        public Criteria andOperateTypeLessThan(Integer value) {
             addCriterion("operate_type <", value, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeLessThanOrEqualTo(Byte value) {
+        public Criteria andOperateTypeLessThanOrEqualTo(Integer value) {
             addCriterion("operate_type <=", value, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeIn(List<Byte> values) {
+        public Criteria andOperateTypeIn(List<Integer> values) {
             addCriterion("operate_type in", values, "operateType");
             return (Criteria) this;
         }
 
-        public Criteria andOperateTypeNotIn(List<Byte> values) {
+        public Criteria andOperateTypeNotIn(List<Integer> values) {
             addCriterion("operate_type not in", values, "operateType");
             return (Criteria) this;
         }

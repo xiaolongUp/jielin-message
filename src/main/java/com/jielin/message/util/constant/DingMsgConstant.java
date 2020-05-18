@@ -20,4 +20,10 @@ public class DingMsgConstant {
     public static final String  DING_LINK_MESSAGE_URL = "dingLinkMessageUrl";
 
     public static final String  DING_LINK_PIC_URL = "dingLinkPicUrl";
+
+    public static final String  DING_CARD_BTN_TITLE = "dingCardBtnTitle";
+
+    public static final String  DING_CARD_ACTION_URL = "dingCardActionUrl";
+
+    public static final String  DING_CARD_TITLE = "dingCardTitle";
 }

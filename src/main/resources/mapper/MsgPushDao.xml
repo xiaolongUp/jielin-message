@@ -9,7 +9,7 @@
         -->
         <result column="id" jdbcType="INTEGER" property="id"/>
         <result column="dsc" jdbcType="VARCHAR" property="dsc"/>
-        <result column="operate_type" jdbcType="TINYINT" property="operateType"/>
+        <result column="operate_type" jdbcType="INTEGER" property="operateType"/>
         <result column="option_value" jdbcType="TINYINT" property="optionValue"/>
         <result column="platform" jdbcType="TINYINT" property="platform"/>
         <result column="user_type" jdbcType="VARCHAR" property="userType"/>

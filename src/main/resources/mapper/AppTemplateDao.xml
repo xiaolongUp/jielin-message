@@ -8,7 +8,7 @@
           This element was generated on Sun Sep 29 15:15:51 CST 2019.
         -->
         <result column="id" jdbcType="INTEGER" property="id"/>
-        <result column="operate_type" jdbcType="TINYINT" property="operateType"/>
+        <result column="operate_type" jdbcType="INTEGER" property="operateType"/>
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="content" jdbcType="VARCHAR" property="content"/>
     </resultMap>

@@ -51,8 +51,9 @@ public class TemplateFactory {
             case WX_MP_PUSH:
                 data = getWxMpTemplate(paramDto, template, toUser);
                 break;
-            //app推送
+            //app推送和钉钉推送
             case APP_PUSH:
+            case DING_PUSH:
                 data = getAppTemplate(paramDto, template);
                 break;
         }

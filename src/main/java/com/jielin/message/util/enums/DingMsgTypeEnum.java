@@ -6,7 +6,9 @@ public enum DingMsgTypeEnum {
 
     IMAGE("image", "图片"),
 
-    LINK("link", "链接");
+    LINK("link", "链接"),
+
+    CARD("action_card", "卡片");
 
     private String type;
 

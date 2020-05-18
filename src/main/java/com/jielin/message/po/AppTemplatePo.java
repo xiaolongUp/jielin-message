@@ -12,7 +12,7 @@ public class AppTemplatePo implements Serializable {
     private Integer id;
 
    //操作类型
-    private Byte operateType;
+    private Integer operateType;
 
     //推送标题
     private String title;
