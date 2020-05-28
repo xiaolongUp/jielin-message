@@ -79,12 +79,9 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
      */
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-        String correlationDataId = correlationData.getId();
-        MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
-        if (ack) {
-            log.info("消息投递成功,ID为: {}", correlationDataId);
-            msgSendResultDao.updateStatus(SendMsgResultEnum.SUCCESS.getStatus(), correlationDataId, 0);
-        } else {
+        if (!ack) {
+            String correlationDataId = correlationData.getId();
+            MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationDataId);
             log.error("消息投递失败,ID为: {},错误信息: {}", correlationDataId, cause);
 
             Integer failNum = resultPo.getFailNum();
@@ -97,7 +94,6 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
                 rabbitTemplate.convertAndSend("", MsgConstant.RETRY_PUSH_MSG, gson.fromJson(resultPo.getContent(), ParamDto.class), correlationData);
                 msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(), correlationDataId, failNum + 1);
             }
-
         }
     }
 
