@@ -43,6 +43,7 @@ public abstract class MsgPush {
         ParamDto paramDto = (ParamDto) list.get(0);
         log.error("correlationId:{},发送消息失败:{}", paramDto.getCorrelationId(), e.getMessage());
         insertMsgSendLog(paramDto, ((OperatePo) list.get(1)).getOperateName(), (PushTypeEnum) list.get(2), false, e.getMessage());
+        localParamDto.remove();
         return false;
     }
 
