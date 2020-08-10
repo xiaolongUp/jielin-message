@@ -77,6 +77,10 @@ public class SynMsgPushService {
             //获取需要推送消息的
             List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
                     PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
+            if (msgPushes.isEmpty()) {
+                log.error("未配置该平台此种类型的推送方式");
+                return false;
+            }
             //将需要推送的数据存入数据库
             prepareSendLog.setCorrelationId(paramDto.getCorrelationId())
                     .setOperateType(paramDto.getOperateType())

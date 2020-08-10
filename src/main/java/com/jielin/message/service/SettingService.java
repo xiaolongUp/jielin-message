@@ -80,7 +80,7 @@ public class SettingService {
         ResponseDto<String> responseDto;
         List<MsgPushPo> msgPushPos = msgPushDao.selectAllByCondition(msgPushPo);
         if (msgPushPos.size() > 0) {
-            return new ResponseDto("不可以重复插入！");
+            return ResponseDto.fail("不可以重复插入！");
         }
 
         int result = msgPushDao.addRecord(msgPushPo);

@@ -51,6 +51,7 @@ public class YunTXSmsConfig {
     /**
      * SMS服务器返回结果处理函数
      */
+    @SuppressWarnings(value = "unchecked")
     private SmsBean _callbackHandler(HashMap<String, Object> map) {
         SmsBean bean = new SmsBean();
         if ("000000".equals(map.get("statusCode"))) {

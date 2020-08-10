@@ -41,9 +41,11 @@ public class ResponseDto<T> {
      *
      * @param error 错误信息描述
      */
-    public ResponseDto(String error) {
-        this.status = -1;
-        this.error = error;
+    public static ResponseDto fail(String error) {
+        ResponseDto responseDto = new ResponseDto();
+        responseDto.status = -1;
+        responseDto.error = error;
+        return responseDto;
     }
 
     /**
