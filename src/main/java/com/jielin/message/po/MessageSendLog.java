@@ -52,11 +52,17 @@ public class MessageSendLog implements Serializable {
     //推送类型
     private String pushType;
 
+    //推送类型code
+    private Integer pushTypeCode;
+
     //推送是否成功
     private Boolean result;
 
     //推送结果
     private String resultMsg;
+
+    //系统内部推送
+    private Boolean readStatus;
 
     public MessageSendLog(ParamDto paramDto, String operateType, String pushType, String resultMsg) {
         this.msgId = paramDto.getMsgId();
@@ -71,8 +77,9 @@ public class MessageSendLog implements Serializable {
         this.resultMsg = resultMsg;
     }
 
-    public MessageSendLog(ParamDto paramDto, String operateType, String pushType, Boolean result, String resultMsg) {
+    public MessageSendLog(ParamDto paramDto, String operateType, Integer optionCode, String pushType, Boolean result, String resultMsg) {
         this(paramDto, operateType, pushType, resultMsg);
+        this.pushTypeCode = optionCode;
         if (null != paramDto.getPlatform()) {
             this.platform = paramDto.getPlatform().toString();
         }

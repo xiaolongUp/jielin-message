@@ -60,4 +60,24 @@ public class ResponseDto<T> {
         this.status = status;
         this.error = error;
     }
+
+    public static <T> ResponseDto success(T body) {
+        ResponseDto<T> dto = new ResponseDto<>();
+        dto.status = 0;
+        dto.setBody(body);
+        return dto;
+    }
+
+    public static ResponseDto success() {
+        ResponseDto dto = new ResponseDto();
+        dto.status = 0;
+        return dto;
+    }
+
+    public static ResponseDto fail(String error) {
+        ResponseDto dto = new ResponseDto();
+        dto.status = -1;
+        dto.setError(error);
+        return dto;
+    }
 }

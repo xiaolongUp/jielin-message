@@ -308,6 +308,6 @@ public class UniPushHandler implements AppMsgPushHandler {
     }
 
     private void insertMsgSendLog(ParamDto paramDto, String operateType, Boolean result, String msg) {
-        messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, APP_PUSH.getDesc(), result, msg));
+        messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, APP_PUSH.getType(), APP_PUSH.getDesc(), result, msg));
     }
 }
