@@ -44,7 +44,7 @@ public class TemplateFactory {
 
         switch (PushTypeEnum.valueOf(optionType)) {
             //微信公众号推送
-            case WX_NP_PUSH:
+            case WX_GZH_PUSH:
                 data = getWxTemplate(paramDto, template, toUser);
                 break;
             //微信小程序推送

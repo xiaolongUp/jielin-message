@@ -17,7 +17,7 @@ public class MsgConstant {
     public static final String WX_EXPIRES_IN = "expires_in";
 
     //微信公众号的access_token
-    public static final String WX_ACCESS_TOKEN = "wx_access_token";
+    public static final String WX_GZH_ACCESS_TOKEN = "wx_gzh_access_token";
 
     //微信小程序的access_token
     public static final String WX_MP_ACCESS_TOKEN = "wx_mp_access_token";

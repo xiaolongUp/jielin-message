@@ -155,3 +155,5 @@ CREATE TABLE `jl_msg_send_result` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `correlation_id` (`correlation_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE jl_msg_uniapp ADD COLUMN `application_id` VARCHAR(255) NOT NULL COMMENT '个推应用的包名';

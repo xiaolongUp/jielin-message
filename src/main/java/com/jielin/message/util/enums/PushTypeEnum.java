@@ -9,7 +9,7 @@ public enum PushTypeEnum {
 
     NO_PUSH(0, "不推送"),
     SMS_PUSH(1, "短信推送"),
-    WX_NP_PUSH(2, "微信公众号推送"),
+    WX_GZH_PUSH(2, "微信公众号推送"),
     APP_PUSH(3, "app推送"),
     WX_MP_PUSH(4, "微信小程序推送"),
     DING_PUSH(5, "钉钉推送"),

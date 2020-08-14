@@ -54,6 +54,8 @@ public class UniPushConfig {
         private String appKey;
 
         private String masterSecret;
+
+        private String applicationId;
     }
 
     private UniPush getUniPush(UniappPo uniappPo) {
@@ -62,6 +64,7 @@ public class UniPushConfig {
         uniPush.appSecret = uniappPo.getAppSecret();
         uniPush.appKey = uniappPo.getAppKey();
         uniPush.masterSecret = uniappPo.getMasterSecret();
+        uniPush.setApplicationId(uniappPo.getApplicationId());
         return uniPush;
     }
 

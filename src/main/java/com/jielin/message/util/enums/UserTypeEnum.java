@@ -3,7 +3,7 @@ package com.jielin.message.util.enums;
 public enum UserTypeEnum {
 
     PROVIDER("provider","悦姐"),
-    CUSTOMER("customer","用户");
+    CUSTOMER_ORDER("customer_order","订单系统用户");
 
     //类型
     private String type;

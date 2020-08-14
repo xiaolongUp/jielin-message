@@ -16,14 +16,11 @@ import com.gexin.rp.sdk.template.TransmissionTemplate;
 import com.gexin.rp.sdk.template.style.Style0;
 import com.google.gson.Gson;
 import com.jielin.message.config.AppPushConfig;
-import com.jielin.message.config.ThirdApiConfig;
 import com.jielin.message.config.UniPushConfig;
 import com.jielin.message.dao.mongo.MessageSendLogDao;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dao.mysql.MsgThirdDao;
-import com.jielin.message.dao.mysql.MsgUserDao;
 import com.jielin.message.dto.ParamDto;
-import com.jielin.message.dto.ResponsePackDto;
 import com.jielin.message.po.*;
 import com.jielin.message.service.PlatformService;
 import com.jielin.message.synpush.app.AppMsgPushHandler;
@@ -40,6 +37,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
@@ -50,7 +48,7 @@ import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
  * @author yxl
  */
 @Slf4j
-public class UniPushHandler implements AppMsgPushHandler {
+public class UniPushHandler implements AppMsgPushHandler<GtBindingInfo> {
 
     @Autowired
     private AppPushConfig config;
@@ -77,13 +75,6 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Autowired
     private MsgThirdDao thirdDao;
 
-    @Autowired
-    private ThirdApiConfig thirdApiConfig;
-
-    @Autowired
-    private MsgUserDao msgUserDao;
-
-
     // STEP1：获取应用基本信息
     @PostConstruct
     private void init() {
@@ -108,9 +99,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         if (!Optional.ofNullable(uniPush).isPresent()) {
             return false;
         }
-
-        String appId = uniPush.getAppId();
-        String appKey = uniPush.getAppKey();
         String appTemplate = templateFactory.newTemplate(paramDto, PushTypeEnum.APP_PUSH.getType(), null);
         if (StringUtils.isBlank(appTemplate)) {
             log.info("生成的空模版：{}", appTemplate);
@@ -120,10 +108,10 @@ public class UniPushHandler implements AppMsgPushHandler {
             return false;
         }
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
-                appTemplate, appId, appKey);
+                appTemplate, uniPush);
         // STEP5：定义"AppMessage"类型消息对象,设置推送消息有效期等推送参数
         List<String> appIds = new ArrayList<>();
-        appIds.add(appId);
+        appIds.add(uniPush.getAppId());
         AppMessage message = new AppMessage();
         message.setData(template);
         message.setAppIdList(appIds);
@@ -145,8 +133,6 @@ public class UniPushHandler implements AppMsgPushHandler {
     @Override
     public boolean sendPushToSingle(ParamDto paramDto, OperatePo operatePo) throws Exception {
 
-        String userType = paramDto.getUserType();
-        Integer userId = paramDto.getUserId();
         Integer platform = paramDto.getPlatform();
 
         Template tmp = templateDao.
@@ -167,10 +153,8 @@ public class UniPushHandler implements AppMsgPushHandler {
             return false;
         }
 
-        String appId = uniPush.getAppId();
-        String appKey = uniPush.getAppKey();
         TransmissionTemplate template = createTransmissionTemplate(tmp.getTitle(),
-                appTemplate, appId, appKey);
+                appTemplate, uniPush);
         SingleMessage message = new SingleMessage();
         message.setData(template);
         // 设置消息离线，并设置离线时间
@@ -180,67 +164,16 @@ public class UniPushHandler implements AppMsgPushHandler {
         // 单推消息类型
         Target target = new Target();
 
-        target.setAppId(appId);
+        target.setAppId(uniPush.getAppId());
+        //获取绑定的cid信息
+        GtBindingInfo bindingInfo = getReceiverBindingInfo(paramDto, operatePo);
         //通过平台类型和推送类型获取调用的接口获取别名
-        String alias = null;
-        MsgThirdPoCriteria criteria = new MsgThirdPoCriteria();
-        criteria.createCriteria()
-                .andPlatformEqualTo(platform)
-                .andUserTypeEqualTo(userType)
-                .andPushTypeEqualTo(PushTypeEnum.APP_PUSH.getType());
-        List<MsgThirdPo> msgThirdPos = thirdDao.selectByExample(criteria);
-        if (CollectionUtils.isEmpty(msgThirdPos)) {
-            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "获取用户别名失败！");
+        //target.setAlias("18530076638"); //别名需要提前绑定
+        if (bindingInfo == null || StringUtils.isBlank(bindingInfo.getCid())) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "查询不到对应的cid");
             return false;
         }
-        MsgThirdPo msgThird = msgThirdPos.get(0);
-        String builder = thirdApiConfig.getJlWebApiUrl() + msgThird.getUrl();
-        String authBuilder = new URIBuilder(builder)
-                .addParameter("appType", userType)
-                .addParameter("phone", paramDto.getPhoneNumber())
-                .build().toString();
-        ResponseEntity<ResponsePackDto> remoteCall = null;
-        //更新用户所在平台的别名
-        MsgUserPo msgUserPo =
-                msgUserDao.selectByCondition(platform, userType, userId);
-        remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, ResponsePackDto.class);
-
-        if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
-                null != remoteCall.getBody()) {
-            if (null != remoteCall.getBody().getBody()) {
-                alias = (String) remoteCall.getBody().getBody();
-                if (null == msgUserPo) {
-                    //将注册平台绑定的cid写入该系统
-                    MsgUserPo record = new MsgUserPo();
-                    record.setPlatform(platform);
-                    record.setUserType(userType);
-                    record.setUserId(userId);
-                    record.setUserPhone(paramDto.getPhoneNumber());
-                    record.setUniappAlias(alias);
-                    msgUserDao.insert(record);
-                } else if (StringUtils.isBlank(msgUserPo.getUniappAlias())) {
-                    msgUserPo.setUniappAlias(alias);
-                    MsgUserPoCriteria example = new MsgUserPoCriteria();
-                    example.createCriteria()
-                            .andUserIdEqualTo(userId)
-                            .andUserTypeEqualTo(userType)
-                            .andPlatformEqualTo(platform);
-                    msgUserDao.updateByExample(msgUserPo, example);
-                }
-            }
-        }
-        //当调用接口没有发生异常且接口没有返回数据时，重试使用本地的存储数据
-        if (StringUtils.isBlank(alias)) {
-
-            if (null != msgUserPo && StringUtils.isNotBlank(msgUserPo.getUniappAlias())) {
-                alias = msgUserPo.getUniappAlias();
-            }
-        }
-        if (StringUtils.isBlank(alias)) {
-            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "app别名不存在！");
-            return false;
-        }
-        target.setAlias(alias); //别名需要提前绑定
+        target.setClientId(bindingInfo.getCid());
         IGtPush pushClient = this.IGtPushMap.get(uniPushName);
         if (!Optional.ofNullable(pushClient).isPresent()) {
             insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "个推client不存在！");
@@ -251,9 +184,46 @@ public class UniPushHandler implements AppMsgPushHandler {
         insertMsgSendLog(paramDto, operatePo.getOperateName(), resultOk, gson.toJson(result));
         log.info("correlationId:{},app推送结果:{}", paramDto.getCorrelationId(), result.getResponse().toString());
         return resultOk;
-
     }
 
+    @Override
+    public GtBindingInfo getReceiverBindingInfo(ParamDto paramDto, OperatePo operatePo) throws URISyntaxException {
+        //通过平台类型和推送类型获取调用的接口返回用户登录过的别名相关信息
+        GtBindingInfo bindingInfo = null;
+        MsgThirdPoCriteria criteria = new MsgThirdPoCriteria();
+        criteria.createCriteria()
+                .andPlatformEqualTo(paramDto.getPlatform())
+                .andUserTypeEqualTo(paramDto.getUserType())
+                .andPushTypeEqualTo(PushTypeEnum.APP_PUSH.getType());
+        List<MsgThirdPo> msgThirdPos = thirdDao.selectByExample(criteria);
+        if (CollectionUtils.isEmpty(msgThirdPos)) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "未配置获取个推cid第三方接口！");
+            return null;
+        }
+        //通过第三方接口查询对应的cid绑定信息
+        MsgThirdPo msgThird = msgThirdPos.get(0);
+        String authBuilder = new URIBuilder(msgThird.getUrl())
+                .addParameter("appType", paramDto.getUserType())
+                .addParameter("phone", paramDto.getPhoneNumber())
+                .build().toString();
+        ResponseEntity<GtBindingInfo> remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, GtBindingInfo.class);
+
+        if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
+                null != remoteCall.getBody()) {
+            bindingInfo = remoteCall.getBody();
+        }
+        //当调用接口没有发生异常且接口没有返回数据时
+        if (StringUtils.isBlank(bindingInfo.getCid())) {
+            insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "app别名不存在！");
+            return null;
+        }
+        return bindingInfo;
+    }
+
+
+    /**
+     * 创建个推推送的通知模版
+     */
     private NotificationTemplate createNoticeTemplate(String title, String text, String appId, String appKey) {
         Style0 style = new Style0();
         // STEP2：设置推送标题、推送内容
@@ -263,7 +233,6 @@ public class UniPushHandler implements AppMsgPushHandler {
         // STEP3：设置响铃、震动等推送效果
         style.setRing(true);  // 设置响铃
         style.setVibrate(true);  // 设置震动
-
 
         // STEP4：选择通知模板
         NotificationTemplate template = new NotificationTemplate();
@@ -276,21 +245,23 @@ public class UniPushHandler implements AppMsgPushHandler {
         return template;
     }
 
-    //创建透传消息模版
-    private TransmissionTemplate createTransmissionTemplate(String title, String content, String appId, String appKey) throws JsonProcessingException {
+    /**
+     * 创建个推推送的透传消息模版
+     */
+    private TransmissionTemplate createTransmissionTemplate(String title, String content, UniPushConfig.UniPush uniPush) throws JsonProcessingException {
         Map<String, String> map = new HashMap<>();
         map.put("content", content);
         map.put("title", title);
         TransmissionTemplate template = new TransmissionTemplate();
-        template.setAppId(appId);
-        template.setAppkey(appKey);
+        template.setAppId(uniPush.getAppId());
+        template.setAppkey(uniPush.getAppKey());
         template.setTransmissionContent(objectMapper.writeValueAsString(map));
         template.setTransmissionType(2);
         Notify notify = new Notify();
         notify.setTitle(title);
         notify.setContent(content);
         notify.setPayload(objectMapper.writeValueAsString(map));
-        String intent = "intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=com.jielin.provider/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=%s;S.content=%s;S.payload=test;end";
+        String intent = "intent:#Intent;action=android.intent.action.oppopush;launchFlags=0x14000000;component=" + uniPush.getApplicationId() + "/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title=%s;S.content=%s;S.payload=test;end";
         notify.setIntent(String.format(intent, title, content));
         notify.setType(GtReq.NotifyInfo.Type._intent);
         template.set3rdNotifyInfo(notify);//设置第三方通知
@@ -307,6 +278,9 @@ public class UniPushHandler implements AppMsgPushHandler {
         return template;
     }
 
+    /**
+     * 推送结果日志
+     */
     private void insertMsgSendLog(ParamDto paramDto, String operateType, Boolean result, String msg) {
         messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, APP_PUSH.getType(), APP_PUSH.getDesc(), result, msg));
     }

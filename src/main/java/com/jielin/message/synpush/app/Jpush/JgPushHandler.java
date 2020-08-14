@@ -71,4 +71,9 @@ public class JgPushHandler implements AppMsgPushHandler {
         return result.isResultOK();
     }
 
+    @Override
+    public Object getReceiverBindingInfo(ParamDto paramDto, OperatePo operatePo) {
+        return null;
+    }
+
 }

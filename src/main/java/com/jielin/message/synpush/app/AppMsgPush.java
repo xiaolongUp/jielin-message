@@ -3,6 +3,7 @@ package com.jielin.message.synpush.app;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.OperatePo;
 import com.jielin.message.synpush.MsgPush;
+import com.jielin.message.util.constant.AppMsgConstant;
 import com.jielin.message.util.enums.PushTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,14 @@ public class AppMsgPush extends MsgPush {
         list.add(operatePo);
         list.add(APP_PUSH);
         super.localParamDto.set(list);
-        return appMsgPushHandler.sendPushToSingle(paramDto, operatePo);
+        if (paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL) != null
+                && paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL) instanceof Boolean
+                && (Boolean) paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL)
+        ) {
+            return appMsgPushHandler.sendPushAll(paramDto, operatePo);
+        } else {
+            return appMsgPushHandler.sendPushToSingle(paramDto, operatePo);
+        }
     }
 
     @Override
