@@ -75,11 +75,4 @@ public class ResponseDto<T> {
         dto.status = 0;
         return dto;
     }
-
-    public static ResponseDto fail(String error) {
-        ResponseDto dto = new ResponseDto();
-        dto.status = -1;
-        dto.setError(error);
-        return dto;
-    }
 }
