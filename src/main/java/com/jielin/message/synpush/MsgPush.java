@@ -41,7 +41,9 @@ public abstract class MsgPush {
         //报错时从当前线程拿出参数记录
         List list = localParamDto.get();
         ParamDto paramDto = (ParamDto) list.get(0);
-        log.error("correlationId:{},发送消息失败:{}", paramDto.getCorrelationId(), e.getMessage());
+        PushTypeEnum pushTypeEnum = (PushTypeEnum) list.get(2);
+        log.error("correlationId:{},[" + pushTypeEnum.getDesc() + "]发送消息失败:{}", paramDto.getCorrelationId(), e.getMessage());
+        log.error("消息推送失败：", e);
         insertMsgSendLog(paramDto, ((OperatePo) list.get(1)).getOperateName(), (PushTypeEnum) list.get(2), false, e.getMessage());
         localParamDto.remove();
         return false;
