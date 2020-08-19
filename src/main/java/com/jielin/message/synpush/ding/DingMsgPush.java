@@ -49,11 +49,7 @@ public class DingMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
-        List<Object> list = new ArrayList<>();
-        list.add(paramDto);
-        list.add(operatePo);
-        list.add(DING_PUSH);
-        super.localParamDto.set(list);
+        super.setThreadLocalParams(paramDto, operatePo, DING_PUSH);
         return push(paramDto, operatePo);
     }
 

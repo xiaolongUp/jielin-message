@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public abstract class MsgPush {
     private MessageSendLogDao messageSendLogDao;
 
     //为不同的线程当前推送参数,threadLocal存放参数的时候注意顺序，recover拿取强转
-    protected ThreadLocal<List> localParamDto = new ThreadLocal<>();
+    private ThreadLocal<List> localParamDto = new ThreadLocal<>();
 
     //报错时，重试三次，每次间隔500毫秒
     @Retryable(value = Exception.class, backoff = @Backoff(delay = 500L, multiplier = 1))
@@ -49,9 +50,31 @@ public abstract class MsgPush {
         return false;
     }
 
+    /**
+     * 对应的handler支持的处理类型
+     *
+     * @param handlerType 对应类型为PushTypeEnum中的type，如需要处理新的推送模式，新增handler即可
+     * @return if equals PushTypeEnum.type
+     * @see PushTypeEnum
+     */
     public abstract boolean supports(Integer handlerType);
 
     protected void insertMsgSendLog(ParamDto paramDto, String operateType, PushTypeEnum pushType, Boolean result, String msg) {
         messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, pushType.getDesc(), result, msg));
+    }
+
+    /**
+     * threadLocal参数赋值
+     *
+     * @param paramDto     消息队列接收的参数
+     * @param operatePo    处理类型对象
+     * @param pushTypeEnum 处理类型枚举
+     */
+    protected void setThreadLocalParams(ParamDto paramDto, OperatePo operatePo, PushTypeEnum pushTypeEnum) {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(pushTypeEnum);
+        this.localParamDto.set(list);
     }
 }

@@ -9,9 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.jielin.message.util.enums.PushTypeEnum.APP_PUSH;
 
 /**
@@ -28,11 +25,7 @@ public class AppMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
-        List<Object> list = new ArrayList<>();
-        list.add(paramDto);
-        list.add(operatePo);
-        list.add(APP_PUSH);
-        super.localParamDto.set(list);
+        super.setThreadLocalParams(paramDto, operatePo, APP_PUSH);
         if (paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL) != null
                 && paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL) instanceof Boolean
                 && (Boolean) paramDto.getParams().get(AppMsgConstant.APP_PUSH_TO_ALL)
