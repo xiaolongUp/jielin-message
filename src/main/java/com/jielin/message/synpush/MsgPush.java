@@ -81,4 +81,19 @@ public abstract class MsgPush {
         list.add(pushTypeEnum);
         this.localParamDto.set(list);
     }
+
+    /**
+     * threadLocal参数赋值
+     *
+     * @param paramDto     消息队列接收的参数
+     * @param operatePo    处理类型对象
+     * @param pushTypeEnum 处理类型枚举
+     */
+    protected void setThreadLocalParams(ParamDto paramDto, OperatePo operatePo, PushTypeEnum pushTypeEnum) {
+        List<Object> list = new ArrayList<>();
+        list.add(paramDto);
+        list.add(operatePo);
+        list.add(pushTypeEnum);
+        this.localParamDto.set(list);
+    }
 }
