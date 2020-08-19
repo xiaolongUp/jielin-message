@@ -24,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jielin.message.util.enums.PushTypeEnum.WX_GZH_PUSH;
@@ -62,11 +61,7 @@ public class WxMsgPush extends MsgPush {
 
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
-        List<Object> list = new ArrayList<>();
-        list.add(paramDto);
-        list.add(operatePo);
-        list.add(WX_GZH_PUSH);
-        super.localParamDto.set(list);
+        super.setThreadLocalParams(paramDto, operatePo, WX_GZH_PUSH);
         boolean result;
 
         String openid = getOpenid(paramDto, operatePo);
