@@ -56,6 +56,7 @@ public class SynMsgPushService {
 
     //根据参数选择不同的推送方式
     public boolean push(ParamDto paramDto) {
+        log.error("push----------------:{}", gson.toJson(paramDto));
         boolean result = false;
         OperatePo operatePo;
         MsgPrepareSendLog prepareSendLog = new MsgPrepareSendLog();
@@ -63,6 +64,7 @@ public class SynMsgPushService {
         criteria.createCriteria()
                 .andOperateTypeEqualTo(paramDto.getOperateType());
         List<OperatePo> operatePos = operateDao.selectByExample(criteria);
+        log.error("operatePos-----------------:{}", gson.toJson(operatePos));
         if (!operatePos.isEmpty()) {
             operatePo = operatePos.get(0);
         } else {
@@ -77,6 +79,7 @@ public class SynMsgPushService {
             //获取需要推送消息的
             List<MsgPushPo> msgPushes = settingService.selectEnableByCondition(paramDto.getOperateType(),
                     PlatformService.platformMap.get(paramDto.getPlatform()), paramDto.getUserType());
+            log.error("msgPushes-----------------:{}", gson.toJson(msgPushes));
             if (msgPushes.isEmpty()) {
                 log.error("未配置该平台此种类型的推送方式");
                 return false;
@@ -96,7 +99,10 @@ public class SynMsgPushService {
                 for (MsgPushPo msgPushPo : msgPushes) {
                     for (MsgPush pushHandler : pushHandlers) {
                         //判断当前的推送方式是否支持
+                        log.error("------------pushHandler---------:{}", pushHandler.supports(msgPushPo.getOptionValue()));
                         boolean supports = pushHandler.supports(msgPushPo.getOptionValue());
+                        log.error("----------supports-----------:{}", supports);
+                        log.error("----------supports-----:{}", supports);
                         if (supports) {
                             result = pushHandler.pushMsg(paramDto, operatePo);
                         }
