@@ -66,9 +66,10 @@ public class DingMsgPush extends MsgPush {
     //钉钉推送，是否重试
     public boolean push(ParamDto paramDto, OperatePo operatePo, Boolean retry) throws ApiException {
 
+
         //获取用户的userId
         String dingUserId = getDingUserId(paramDto.getPhoneNumber());
-
+        log.error("dingUserId:{}", dingUserId);
         OapiMessageCorpconversationAsyncsendV2Request request = new OapiMessageCorpconversationAsyncsendV2Request();
         if (!Optional.ofNullable(dingUserId).isPresent()) {
             super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, false, "获取用户钉钉id失败!");
@@ -79,12 +80,14 @@ public class DingMsgPush extends MsgPush {
         request.setToAllUser(false);
 
         Template template = templateDao.selectByOperateAndPushType(paramDto.getOperateType(), DING_PUSH.getType());
+        log.error("template:{}", gson.toJson(template));
         if (template == null) {
             super.insertMsgSendLog(paramDto, operatePo.getOperateName(), DING_PUSH, false, "未配置该类型消息钉钉模版!");
             return false;
         }
         String newTemplate = templateFactory.newTemplate(paramDto, DING_PUSH.getType(), null);
         OapiMessageCorpconversationAsyncsendV2Request.Msg msg = new OapiMessageCorpconversationAsyncsendV2Request.Msg();
+        log.error("DING_MSG_TYPE:{}", DingMsgConstant.DING_MSG_TYPE);
         switch ((String) paramDto.getParams().get(DingMsgConstant.DING_MSG_TYPE)) {
             case "text":
                 msg.setMsgtype(DingMsgTypeEnum.TEXT.getType());
@@ -129,7 +132,7 @@ public class DingMsgPush extends MsgPush {
         }
 
         OapiMessageCorpconversationAsyncsendV2Response response = client.execute(request, config.getAccessToken());
-
+        log.error("response:{}", response);
         //当推送结果不成功时，获取token，再重试，只重试一次
         if (!response.isSuccess() && retry) {
             log.error(response.getErrmsg());
