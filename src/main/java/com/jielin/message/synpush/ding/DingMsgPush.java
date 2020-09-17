@@ -150,6 +150,8 @@ public class DingMsgPush extends MsgPush {
         OapiUserGetByMobileRequest request = new OapiUserGetByMobileRequest();
         request.setMobile(mobile);
 
+        log.error("手机号为：{}", mobile);
+        log.error("配置文件accesstoken:{}", config.getAccessToken());
         OapiUserGetByMobileResponse execute = userClient.execute(request, config.getAccessToken());
         log.error("获取钉钉用户信息:{}", execute);
         return execute.getUserid();
