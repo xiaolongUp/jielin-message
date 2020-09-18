@@ -60,7 +60,11 @@ public abstract class MsgPush {
     public abstract boolean supports(Integer handlerType);
 
     protected void insertMsgSendLog(ParamDto paramDto, String operateType, PushTypeEnum pushType, Boolean result, String msg) {
-        messageSendLogDao.insert(new MessageSendLog(paramDto, operateType, pushType.getDesc(), result, msg));
+        MessageSendLog log = new MessageSendLog(paramDto, operateType, pushType.getType(),pushType.getDesc(), result, msg);
+        if (pushType == PushTypeEnum.SYSTEM_PUSH) {
+            log.setReadStatus(false);
+        }
+        messageSendLogDao.insert(log);
     }
 
     /**
@@ -77,4 +81,5 @@ public abstract class MsgPush {
         list.add(pushTypeEnum);
         this.localParamDto.set(list);
     }
+
 }
