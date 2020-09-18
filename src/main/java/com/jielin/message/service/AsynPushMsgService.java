@@ -34,7 +34,6 @@ public class AsynPushMsgService {
     @RabbitHandler
     @RabbitListener(queues = MsgConstant.PUSH_MSG)
     public void process(ParamDto paramDto, Channel channel, Message message) {
-        log.error("收到消息--------------------：{}", paramDto.toString());
         //获取correlationDataId
         String correlationDataId =
                 (String) message.getMessageProperties().getHeaders().get(MsgConstant.CORRELATION_ID);
