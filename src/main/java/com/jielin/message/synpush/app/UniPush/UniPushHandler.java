@@ -206,6 +206,7 @@ public class UniPushHandler implements AppMsgPushHandler<GtBindingInfo> {
                 .addParameter("appType", paramDto.getUserType())
                 .addParameter("phone", paramDto.getPhoneNumber())
                 .build().toString();
+        log.error("app获取cid远程调用地址:{}", authBuilder);
         ResponseEntity<GtBindingInfo> remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, GtBindingInfo.class);
 
         if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&
@@ -213,7 +214,7 @@ public class UniPushHandler implements AppMsgPushHandler<GtBindingInfo> {
             bindingInfo = remoteCall.getBody();
         }
         //当调用接口没有发生异常且接口没有返回数据时
-        if (StringUtils.isBlank(bindingInfo.getCid())) {
+        if (bindingInfo != null && StringUtils.isBlank(bindingInfo.getCid())) {
             insertMsgSendLog(paramDto, operatePo.getOperateName(), false, "app别名不存在！");
             return null;
         }

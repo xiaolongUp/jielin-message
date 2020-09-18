@@ -118,6 +118,7 @@ public class WxMpMsgPush extends MsgPush {
         String authBuilder = new URIBuilder(msgThird.getUrl())
                 .addParameter("phone", paramDto.getPhoneNumber())
                 .build().toString();
+        log.error("微信小程序获取openid远程调用地址:{}", authBuilder);
         ResponseEntity<String> remoteCall = restTemplate.exchange(authBuilder, HttpMethod.resolve(msgThird.getHttpMethod().toUpperCase()), null, String.class);
 
         if (remoteCall != null && remoteCall.getStatusCode().equals(HttpStatus.OK) &&

@@ -39,6 +39,7 @@ public class DingtalkConfig {
                 .queryParam("appkey", this.appKey)
                 .queryParam("appsecret", this.appSecret).build();
 
+        log.error("获取钉钉用户id远程调用地址:{}", builder.toUriString());
         Map<String, Object> result = restTemplate.exchange(builder.toUriString(),
                 HttpMethod.GET,
                 null,

@@ -17,7 +17,7 @@ public class SystemMsgPush extends MsgPush {
     @Override
     public boolean pushMsg(ParamDto paramDto, OperatePo operatePo) throws Exception {
         super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SYSTEM_PUSH, true, "消息内部推送！");
-        return false;
+        return true;
     }
 
     @Override
