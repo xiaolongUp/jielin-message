@@ -9,6 +9,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.po.OperatePo;
 import com.jielin.message.service.ProducerService;
 import com.jielin.message.service.SynMsgPushService;
+import com.jielin.message.synpush.app.UniPush.GtBindingInfo;
 import com.jielin.message.synpush.app.UniPush.UniPushHandler;
 import com.jielin.message.util.constant.MsgConstant;
 import com.taobao.api.ApiException;
@@ -23,6 +24,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,7 +131,7 @@ public class JielinMessageApplicationTests {
                 .setPhoneNumber("15546049601")
                 .setUserType("provider")
                 .setParams(map);
-        uniPushHandler.sendPushAll(dto,new OperatePo());
+        uniPushHandler.sendPushAll(dto, new OperatePo());
     }
 
 
@@ -151,4 +153,16 @@ public class JielinMessageApplicationTests {
         rabbitTemplate.convertAndSend(MsgConstant.PUSH_MSG, paramDto);
     }
 
+    /**
+     * 获取个推绑定的用户信息
+     */
+    @Test
+    public void gtBindingInfo() {
+        RestTemplate restTemplate = new RestTemplate();
+        GtBindingInfo userInfo = restTemplate.getForObject("https://test.yueguanjia.com/jielin-web/thirdApp/custom/gtBinding?appType=customer_order&phone=18456071819", GtBindingInfo.class);
+
+        if (userInfo != null) {
+            System.out.println(userInfo.getCid());
+        }
+    }
 }
