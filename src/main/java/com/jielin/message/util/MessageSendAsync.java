@@ -69,6 +69,18 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
         rabbitTemplate.convertAndSend(exchange, routingKey, message, correlationData);
     }
 
+    /**
+     * 消息失败重试投递方法
+     * @param exchange 交换机
+     * @param routingKey 路由key
+     * @param message 消息实体
+     * @param correlationDataId 已创建的消息的唯一标实，防止重复消费
+     */
+    public void sendMsg(String exchange, String routingKey, Object message, String correlationDataId) {
+        CorrelationData correlationData = new CorrelationData(correlationDataId);
+        rabbitTemplate.convertAndSend(exchange, routingKey, message, correlationData);
+    }
+
 
     /**
      * 异步监听 消息是否到达 exchange
@@ -92,7 +104,7 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
             //重试投递
             else {
                 rabbitTemplate.convertAndSend("", MsgConstant.RETRY_PUSH_MSG, gson.fromJson(resultPo.getContent(), ParamDto.class), correlationData);
-                msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(), correlationDataId, failNum + 1);
+                msgSendResultDao.updateStatus(SendMsgResultEnum.ENQUEUE_FAIL.getStatus(), correlationDataId, failNum + 1);
             }
         }
     }
@@ -114,7 +126,7 @@ public class MessageSendAsync implements RabbitTemplate.ConfirmCallback, RabbitT
         MsgSendResultPo resultPo = msgSendResultDao.selectByCorrelationId(correlationId);
         log.error("没有找到对应队列，消息投递失败,ID为: {}, replyCode {} , replyText {}, exchange {} routingKey {}",
                 correlationId, replyCode, replyText, exchange, routingKey);
-        msgSendResultDao.updateStatus(SendMsgResultEnum.FAIL.getStatus(),
+        msgSendResultDao.updateStatus(SendMsgResultEnum.ENQUEUE_FAIL.getStatus(),
                 (String) message.getMessageProperties().getHeaders().get(CORRELATION_ID), resultPo.getFailNum() + 1);
     }
 

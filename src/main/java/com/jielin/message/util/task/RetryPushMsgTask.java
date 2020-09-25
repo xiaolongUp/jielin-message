@@ -9,7 +9,6 @@ import com.jielin.message.util.constant.MsgConstant;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,8 +25,8 @@ public class RetryPushMsgTask {
     @Autowired
     private Gson gson;
 
-    //网络抖动，数据未消费成功时，定时扫描数据库当中没有投递成功的消息，取出后重新投递
-    @Scheduled(cron = "0 */2 * * * *")
+    //网络抖动，数据未消费成功时，定时扫描数据库当中没有投递成功的消息，取出后重新投递（需要时开启即可）
+    //@Scheduled(cron = "0 */30 * * * *")
     public void reportCurrentTime() {
         List<MsgSendResultPo> msgSendResultPos = msgSendResultDao.selectMsgPushFail();
         msgSendResultPos.forEach(resultPo -> {
