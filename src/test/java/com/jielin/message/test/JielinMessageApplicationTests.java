@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
@@ -61,6 +63,11 @@ public class JielinMessageApplicationTests {
     private ProducerService producerService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+
 
     /**
      * 发送rabbitMq的消息
@@ -164,5 +171,19 @@ public class JielinMessageApplicationTests {
         if (userInfo != null) {
             System.out.println(userInfo.getCid());
         }
+    }
+
+    /**
+     * 发送邮件测试
+     */
+    @Test
+    public void sendSimpleMail() throws Exception {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("ping@yueguanjia.com");
+        message.setTo("xiaolong.yang@yueguanjia.com");
+        message.setSubject("主题：简单邮件");
+        message.setText("测试邮件内容");
+
+        mailSender.send(message);
     }
 }

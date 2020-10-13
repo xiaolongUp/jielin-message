@@ -15,6 +15,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -39,6 +41,9 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
 
     @Autowired
     private TemplateDao templateDao;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -79,6 +84,12 @@ public class SmsMsgPush extends MsgPush implements ApplicationContextAware {
             log.info("correlationId:{},短信推送结果:{}", paramDto.getCorrelationId(), smsBean.getMessage());
             return smsBean.getIsSuccess();
         } else {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("ping@yueguanjia.com");
+            message.setTo("zhenyang.shen@yueguanjia.com");
+            message.setSubject("推送服务测试环境模拟发送短信");
+            message.setText("测试环境发送短信：参数【" + paramDto.toString() + "】");
+            mailSender.send(message);
             super.insertMsgSendLog(paramDto, operatePo.getOperateName(), SMS_PUSH, true, "测试环境发送短信！");
             log.info("correlationId:{},测试环境和本地环境的短信发送：{}", paramDto.getCorrelationId(), paramDto.toString());
             return true;
