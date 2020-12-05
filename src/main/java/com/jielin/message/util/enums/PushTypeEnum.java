@@ -13,7 +13,8 @@ public enum PushTypeEnum {
     APP_PUSH(3, "app推送"),
     WX_MP_PUSH(4, "微信小程序推送"),
     DING_PUSH(5, "钉钉推送"),
-    SYSTEM_PUSH(6, "系统内部推送");
+    SYSTEM_PUSH(6, "系统内部推送"),
+    WEBSOCKET_PUSH(7, "websocket推送");
 
     //类型
     private int type;

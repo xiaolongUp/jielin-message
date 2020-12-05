@@ -30,6 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(STATIC_RESOURCE).permitAll()
                 .antMatchers(HTTP_RESOURCE).permitAll()
+                .antMatchers("/endpointSocket/**").permitAll()
                 .anyRequest().authenticated().and()
                 .formLogin()
                 .loginPage("/login")
