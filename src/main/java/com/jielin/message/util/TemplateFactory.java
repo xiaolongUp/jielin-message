@@ -1,6 +1,7 @@
 package com.jielin.message.util;
 
 
+import com.jielin.message.config.WeChatConfig;
 import com.jielin.message.dao.mongo.TemplateDao;
 import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.WechatMpTemplateMsg;
@@ -8,13 +9,11 @@ import com.jielin.message.dto.WechatTemplateMsg;
 import com.jielin.message.po.Template;
 import com.jielin.message.util.enums.PushTypeEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 创建模版的工厂方法
@@ -22,10 +21,15 @@ import java.util.Optional;
  * @author yxl
  */
 @Component
-public class TemplateFactory {
+public class TemplateFactory implements InitializingBean {
 
     @Autowired
     private TemplateDao templateDao;
+
+    @Autowired
+    private WeChatConfig weChatConfig;
+
+    Map<String, WeChatConfig.WeChatMp> weChatMpMap = new HashMap<>();
 
     private static final String FIRST = "first";
 
@@ -87,6 +91,10 @@ public class TemplateFactory {
      */
     private String getWxTemplate(ParamDto paramDto, Template template, String toUser) {
         WechatTemplateMsg templateMsg = new WechatTemplateMsg();
+
+        WeChatConfig.WeChatMp weChatMp = weChatMpMap.get(paramDto.getUserType());
+        WechatTemplateMsg.Miniprogram miniprogram = new WechatTemplateMsg.Miniprogram(weChatMp.getPagepath(), weChatMp.getAppid());
+        templateMsg.setMiniprogram(miniprogram);
         templateMsg.setTemplate_id(template.getTmpId())
                 .setTouser(toUser);
         if (StringUtils.isNotBlank(template.getTitle())) {
@@ -125,5 +133,12 @@ public class TemplateFactory {
             templateMsg.add(entry.getKey(), value);
         }
         return templateMsg.toJsonStr();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        for (WeChatConfig.WeChatMp weChatMp : weChatConfig.getWeChatMps()) {
+            weChatMpMap.put(weChatMp.getSystemApply(), weChatMp);
+        }
     }
 }

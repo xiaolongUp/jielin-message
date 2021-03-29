@@ -27,6 +27,8 @@ public class WechatTemplateMsg {
     //data数据
     private TemplateItem data;
 
+    private Miniprogram miniprogram;
+
     //添加新属性
     public WechatTemplateMsg add(String key, String value, String color){
         data.put(key, new Item(value, color));
@@ -61,6 +63,14 @@ public class WechatTemplateMsg {
         //字体颜色
         private String color;
 
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class Miniprogram {
+        private String pagepath ;
+        private String appid;
     }
 
 }

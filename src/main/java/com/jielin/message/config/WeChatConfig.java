@@ -92,6 +92,11 @@ public class WeChatConfig {
         private String accessToken;
 
         /**
+         * 公众号底部跳转小程序链接
+         */
+        private String pagepath;
+
+        /**
          * 判断当前的用户类型是否适用该公众号
          *
          * @param type 用户类型
