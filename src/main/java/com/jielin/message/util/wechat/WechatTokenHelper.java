@@ -36,6 +36,8 @@ public class WechatTokenHelper {
     @Autowired
     private RestTemplate restTemplate;
 
+    public static final String GZH_PREFIX = "customer_order";
+
     @PostConstruct
     private void initToken() {
         //初始化公众号的token
@@ -49,15 +51,18 @@ public class WechatTokenHelper {
 
     //获取微信公众号接口访问token或者小程序的调用接口的token
     public String getToken(boolean fromCache, String userType) {
-        String prefix = userType + ":";
+//        String prefix = userType + ":";
+        String prefix = GZH_PREFIX + ":";
         String gzhAccessToken;
         if (!fromCache) {
-            gzhAccessToken = getGzhAccessToken(userType);
+//            gzhAccessToken = getGzhAccessToken(userType);
+            gzhAccessToken = getGzhAccessToken(GZH_PREFIX);
         } else {
             String wxGzhAccessToken = redisTemplate.opsForValue().get(prefix + MsgConstant.WX_GZH_ACCESS_TOKEN);
             //当微信公众号token不存在时，获取token并保存
             if (StringUtils.isBlank(wxGzhAccessToken)) {
-                gzhAccessToken = getGzhAccessToken(userType);
+//                gzhAccessToken = getGzhAccessToken(userType);
+                gzhAccessToken = getGzhAccessToken(GZH_PREFIX);
             } else {
                 gzhAccessToken = wxGzhAccessToken;
             }
@@ -66,9 +71,11 @@ public class WechatTokenHelper {
     }
 
     private String getGzhAccessToken(String userType) {
-        String prefix = userType + ":";
+//        String prefix = userType + ":";
+        String prefix = GZH_PREFIX + ":";
         for (WeChatConfig.WeChatGzh weChatGzh : weChatConfig.getWeChatGzhs()) {
-            if (weChatGzh.support(userType)) {
+//            if (weChatGzh.support(userType)) {
+            if (weChatGzh.support(GZH_PREFIX)) {
                 UriComponents builder = UriComponentsBuilder.fromHttpUrl(WeChatConfig.ACCESS_TOKEN_URL)
                         .queryParam("grant_type", "client_credential")
                         .queryParam("appid", weChatGzh.getAppid())
