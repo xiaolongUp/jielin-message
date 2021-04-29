@@ -85,6 +85,7 @@ public class SynMsgPushService {
             //将需要推送的数据存入数据库
             prepareSendLog.setCorrelationId(paramDto.getCorrelationId())
                     .setOperateType(paramDto.getOperateType())
+                    .setPhone(paramDto.getPhoneNumber())
                     .setPushTypeList(msgPushes.stream().map(MsgPushPo::getOptionValue).collect(Collectors.toList()))
                     .setParams(gson.toJson(paramDto));
             msgPrepareSendLogDao.insert(prepareSendLog);
