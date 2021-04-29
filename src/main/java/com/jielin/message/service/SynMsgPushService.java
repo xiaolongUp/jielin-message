@@ -68,6 +68,7 @@ public class SynMsgPushService {
         } else {
             prepareSendLog.setCorrelationId(paramDto.getCorrelationId())
                     .setMsgId(paramDto.getMsgId())
+                    .setPhone(paramDto.getPhoneNumber())
                     .setOperateType(paramDto.getOperateType())
                     .setMsg("未配置该方式的推送！");
             msgPrepareSendLogDao.insert(prepareSendLog);
