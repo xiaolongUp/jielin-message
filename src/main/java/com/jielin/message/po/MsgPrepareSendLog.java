@@ -26,6 +26,9 @@ public class MsgPrepareSendLog implements Serializable {
     //消息的唯一标识
     private String correlationId;
 
+    //手机号
+    private String phone;
+
     //插入时间
     private Date operateTime = new Date();
 
