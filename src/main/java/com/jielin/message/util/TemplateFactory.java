@@ -7,6 +7,7 @@ import com.jielin.message.dto.ParamDto;
 import com.jielin.message.dto.WechatMpTemplateMsg;
 import com.jielin.message.dto.WechatTemplateMsg;
 import com.jielin.message.po.Template;
+import com.jielin.message.util.constant.MailConstant;
 import com.jielin.message.util.enums.PushTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -59,6 +60,9 @@ public class TemplateFactory implements InitializingBean {
             case APP_PUSH:
             case DING_PUSH:
                 data = getAppTemplate(paramDto, template);
+                break;
+            case Mail_PUSH:
+                data = getMailTemplate(paramDto, template);
                 break;
         }
         return data;
@@ -133,6 +137,23 @@ public class TemplateFactory implements InitializingBean {
             templateMsg.add(entry.getKey(), value);
         }
         return templateMsg.toJsonStr();
+    }
+
+    /**
+     * 构建邮件模版
+     *
+     * @param paramDto 参数
+     * @param template 模版参数
+     * @return 需要发送的邮件
+     */
+    private String getMailTemplate(ParamDto paramDto, Template template) {
+        Map<String, String> paramsMap = (HashMap<String,String>) paramDto.getParams().get(MailConstant.MAIL_PARAMS);
+        List<String> paramKeys = SortUtil.sortByMapKey(template.getParamMap());
+        List<String> params = new ArrayList<>();
+        for (String key : paramKeys) {
+            params.add(paramsMap.get(key));
+        }
+        return String.format(template.getExample(), params.toArray(new String[params.size()]));
     }
 
     @Override
