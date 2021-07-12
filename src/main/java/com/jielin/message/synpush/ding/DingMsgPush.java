@@ -67,7 +67,7 @@ public class DingMsgPush extends MsgPush {
     public boolean push(ParamDto paramDto, OperatePo operatePo, Boolean retry) throws ApiException {
 
         //获取用户的userId
-        String dingUserId = getDingUserId(paramDto.getPhoneNumber());
+        String dingUserId = getDingUserId(paramDto.getPhoneNumber(), true);
 
         OapiMessageCorpconversationAsyncsendV2Request request = new OapiMessageCorpconversationAsyncsendV2Request();
         if (!Optional.ofNullable(dingUserId).isPresent()) {
@@ -142,12 +142,17 @@ public class DingMsgPush extends MsgPush {
     }
 
 
-    private String getDingUserId(String mobile) throws ApiException {
+    private String getDingUserId(String mobile, Boolean retry) throws ApiException {
 
         OapiUserGetByMobileRequest request = new OapiUserGetByMobileRequest();
         request.setMobile(mobile);
 
         OapiUserGetByMobileResponse execute = userClient.execute(request, config.getAccessToken());
+        if (!execute.isSuccess() && retry) {
+            log.error(execute.getErrmsg());
+            config.initToken();
+            getDingUserId(mobile, false);
+        }
         return execute.getUserid();
     }
 }
