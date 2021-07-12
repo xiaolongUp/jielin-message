@@ -56,4 +56,7 @@ public class MsgConstant {
     //生产环境
     public static final String PROD_PROFILE = "prod";
 
+    //钉钉，邮件等可能需要直接推送，不需要读取模版发送消息
+    public static final String CONTENT = "content";
+
 }

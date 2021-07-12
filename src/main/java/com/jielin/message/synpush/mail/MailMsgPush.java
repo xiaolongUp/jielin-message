@@ -57,7 +57,7 @@ public class MailMsgPush extends MsgPush {
             return false;
         }
         String content = (String) paramDto.getParams().get(MailConstant.CONTENT);
-        String mailContent = null;
+        String mailContent;
         if (StringUtils.isNotBlank(content)) {
             mailContent = content;
         } else {
