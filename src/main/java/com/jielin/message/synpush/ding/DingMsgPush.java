@@ -163,7 +163,7 @@ public class DingMsgPush extends MsgPush {
         if (!execute.isSuccess() && retry) {
             log.error(execute.getErrmsg());
             config.initToken();
-            getDingUserId(mobile, false);
+            return getDingUserId(mobile, false);
         }
         return execute.getUserid();
     }
