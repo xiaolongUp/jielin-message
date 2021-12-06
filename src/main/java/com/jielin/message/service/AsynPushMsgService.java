@@ -34,6 +34,9 @@ public class AsynPushMsgService {
     @Autowired
     private MessageSendAsync messageSendAsync;
 
+    //两个小时
+    public static final int twoHours = 7200000;
+
     //监听消息队列当中的数据
     @RabbitHandler
     @RabbitListener(queues = MsgConstant.PUSH_MSG)
@@ -45,6 +48,13 @@ public class AsynPushMsgService {
         //当数据不存在时，说明该数据为无效数据，直接丢弃该数据
         if (resultPo == null) {
             log.error("-----消费数据未入库异常-----{}", message.toString());
+            channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+            return;
+        }
+        long currentTimeMillis = System.currentTimeMillis();
+        //当消息入队时间大于十二个小时，舍弃掉不消费，不入队
+        if (paramDto.getQueuedTime() != null && (currentTimeMillis - paramDto.getQueuedTime()) > twoHours) {
+            log.error("-----消费数据入队时间超过十二个小时，舍弃-----{}", message.toString());
             channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
             return;
         }

@@ -43,6 +43,9 @@ public class ParamDto implements Serializable {
     //消息的唯一标识（消息队列生成的全局唯一）
     private String correlationId;
 
+    //入队时间
+    private Long queuedTime;
+
     //需要的参数
     private Map<String, Object> params;
 }
