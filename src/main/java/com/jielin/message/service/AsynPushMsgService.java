@@ -54,7 +54,7 @@ public class AsynPushMsgService {
         long currentTimeMillis = System.currentTimeMillis();
         //当消息入队时间大于配置时间，舍弃掉不消费，不入队
         if (paramDto.getQueuedTime() != null && (currentTimeMillis - paramDto.getQueuedTime()) > twoHours) {
-            log.error("-----消费数据入队时间超过十二个小时，舍弃-----{}", message.toString());
+            log.error("-----消费数据入队时间超过两个小时，舍弃-----{}", message.toString());
             channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
             return;
         }
