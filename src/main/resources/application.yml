@@ -1,0 +1,515 @@
+spring:
+  profiles:
+    active: test
+
+server:
+  max-http-header-size: 48000
+
+---
+#生产环境配置
+spring:
+  profiles: prod
+  #mysql数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1/push?characterEncoding=utf8&useSSL=true
+    username: push
+    password: push
+    hikari:
+      max-lifetime: 120000
+  #mongo配置
+  data:
+    mongodb:
+      uri: mongodb://msg:root@127.0.0.1:3717/ygj_msg?replicaSet=mgset-54298640
+  thymeleaf:
+    #视图 这是默认的配置
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    #检查模板是否存在，然后再呈现
+    check-template: true
+    encoding: UTF-8
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 8
+    timeout: 5s
+    password: root
+  # 配置rabbitMQ
+  rabbitmq:
+    host: xxx
+    username: root
+    password: root
+    # 消息失败返回，比如路由不到队列时触发回调
+    publisher-returns: true
+    # 消息正确发送确认
+    publisher-confirms: true
+    # 消费方 开启手动ACK
+    listener:
+      simple:
+        acknowledge-mode: manual
+      direct:
+        default-requeue-rejected: false
+    #启用发送重试
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2s
+  flyway:
+    enabled: false
+    # 迁移脚本的位置，默认db/migration.
+    locations: classpath:/flyway
+    # 当迁移时发现目标schema非空，而且带有没有元数据的表时，是否自动执行基准迁移，默认false.
+    baseline-on-migrate: true
+  mail:
+    host: smtp.xxxx.com
+    username: root
+    password: root
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            port: 465
+      default-encoding: utf-8
+
+
+server:
+  port: 8887
+  servlet:
+    context-path: /jielin-message
+
+#控制台打印sql语句
+logging:
+  level:
+    com:
+      jielin:
+        message:
+          dao: debug
+  config: classpath:log4j2-spring.xml
+
+#分页助手
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countsql
+
+#mybatis自动生产配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.jielin.message.po  # 注意：对应实体类的路径
+  configuration:
+    map-underscore-to-camel-case: true #驼峰转换
+
+#白名单设置
+white:
+  access:
+    - 127.0.0.1
+    - 0:0:0:0:0:0:0:1
+    - 121.43.235.99
+
+
+
+#短信配置
+ytxsms:
+  serverIp: xxx.com
+  serverPort: 8883
+  accountSid: xxx
+  accountToken: xxx
+  appId: xxx
+
+#微信配置文件
+wechat:
+  #公众号
+  weChatGzhs:
+    -
+      systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+  #小程序
+  weChatMps:
+    -
+      #悦姐小程序
+      systemApply: provider
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order/order
+    -
+      #用户订单系统小程序
+      systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order-list/order-list?code=-1&parent=0
+
+#第三方接口调用
+third:
+  jlWebApiUrl: http://wechat.xxx.com/jielin-web
+  jlWebUserName: xxx
+  jlWebPassword: xxx
+
+#钉钉推送（此处的组织应为悦管家网络科技有限公司）
+dingtalk:
+  agentId: 1236320527
+  appKey: xxx
+  appSecret: xxx
+  contractProcessCode: xxx
+
+#apollo配置中心
+app:
+  id: jielin-msg
+apollo:
+  meta: http://localhost:8080
+  bootstrap:
+    enabled: true
+    eagerLoad:
+      enabled: true
+
+---
+#开发环境配置
+spring:
+  profiles: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jielin-msg?characterEncoding=utf8&useSSL=true
+    username: root
+    password: 123456
+    hikari:
+      max-lifetime: 120000
+  data:
+    mongodb:
+      host: 127.0.0.1
+      database: jielin
+      port: 27017
+      username: root
+      password: root
+  thymeleaf:
+    #视图 这是默认的配置
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    #检查模板是否存在，然后再呈现
+    check-template: true
+    encoding: UTF-8
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 8
+    timeout: 5s
+    password:
+  # 配置rabbitMQ
+  rabbitmq:
+    host: 127.0.0.1
+    username: guest
+    password: guest
+    # 消息失败返回，比如路由不到队列时触发回调
+    publisher-returns: true
+    # 消息正确发送确认
+    publisher-confirms: true
+    # 消费方 开启手动ACK
+    listener:
+      simple:
+        acknowledge-mode: manual
+      direct:
+        default-requeue-rejected: false
+    #启用发送重试
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2s
+  flyway:
+    enabled: false
+    # 迁移脚本的位置，默认db/migration.
+    locations: classpath:/flyway
+    # 当迁移时发现目标schema非空，而且带有没有元数据的表时，是否自动执行基准迁移，默认false.
+    baseline-on-migrate: true
+  mail:
+    host: smtp.xxx.com
+    username: root
+    password: root
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            port: 465
+      default-encoding: utf-8
+
+server:
+  port: 8887
+  servlet:
+    context-path: /jielin-message
+
+#控制台打印sql语句
+logging:
+  level:
+    com:
+      jielin:
+        message:
+          dao: debug
+  config: classpath:log4j2-spring.xml
+
+#分页助手
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countsql
+
+#mybatis自动生产配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.jielin.message.po  # 注意：对应实体类的路径
+  configuration:
+    map-underscore-to-camel-case: true #驼峰转换
+
+#白名单设置
+white:
+  access:
+    - 127.0.0.1
+    - 0:0:0:0:0:0:0:1
+    - 121.43.235.99
+
+#app推送配置,enabled同时只能有一个推送的sdk为true
+app-push:
+  jgPush:
+    appKey: xxx
+    masterSecret: xxx
+  uniPush:
+    providerAppId: xxx
+    providerAppSecret: xxx
+    providerAppKey: xxx
+    providerMasterSecret: xxx
+    customerAppId: xxx
+    customerAppSecret: xxx
+    customerAppKey: xxx
+    customerMasterSecret: xxx
+    url: http://sdk.open.api.igexin.com/apiex.htm
+
+#短信配置
+ytxsms:
+  serverIp: xxx.xxx.com
+  serverPort: 8883
+  accountSid: xxx
+  accountToken: xxx
+  appId: xxx
+
+#微信配置文件
+wechat:
+  #公众号
+  weChatGzhs:
+    - systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+  #小程序
+  weChatMps:
+    - #悦姐小程序
+      systemApply: provider
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order/order
+    - #用户订单系统小程序
+      systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order-list/order-list?code=-1&parent=0
+
+#第三方接口调用
+third:
+  jlWebApiUrl: https://k8s-xxx.com
+  jlWebUserName: xxx
+  jlWebPassword: xxx
+
+#钉钉推送（此处的组织信息为餐饮的组织信息）
+dingtalk:
+  agentId: xxx
+  appKey: xxx
+  appSecret: xxx
+  contractProcessCode: xxx
+
+#apollo配置中心
+app:
+  id: jielin-msg
+apollo:
+  meta: http://k8s-xxx:30377
+  bootstrap:
+    enabled: true
+    eagerLoad:
+      enabled: true
+
+---
+#测试环境配置
+spring:
+  profiles: test
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/jielin-msg?useUnicode=true&zeroDateTimeBehavior=convertToNull&characterEncoding=utf8
+    username: msg
+    password: msg123
+    hikari:
+      max-lifetime: 120000
+  data:
+    mongodb:
+      host: 127.0.0.1
+      database: ygj_msg
+      port: 27017
+      username: root
+      password: root
+  thymeleaf:
+    #视图 这是默认的配置
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    #检查模板是否存在，然后再呈现
+    check-template: true
+    encoding: UTF-8
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 8
+    timeout: 5s
+    password: root
+  # 配置rabbitMQ
+  rabbitmq:
+    host: 127.0.0.1
+    username: root
+    password: root
+    # 消息失败返回，比如路由不到队列时触发回调
+    publisher-returns: true
+    # 消息正确发送确认
+    publisher-confirms: true
+    # 消费方 开启手动ACK
+    listener:
+      simple:
+        acknowledge-mode: manual
+      direct:
+        default-requeue-rejected: false
+    #启用发送重试
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2s
+  flyway:
+    enabled: false
+    # 迁移脚本的位置，默认db/migration.
+    locations: classpath:/flyway
+    # 当迁移时发现目标schema非空，而且带有没有元数据的表时，是否自动执行基准迁移，默认false.
+    baseline-on-migrate: true
+  mail:
+    host: smtp.xxx.com
+    username: root
+    password: root
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            port: 465
+    default-encoding: utf-8
+
+
+server:
+  port: 8887
+  servlet:
+    context-path: /jielin-message
+
+#控制台打印sql语句
+logging:
+  level:
+    com:
+      jielin:
+        message:
+          dao: debug
+  config: classpath:log4j2-spring.xml
+
+#分页助手
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countsql
+
+#mybatis自动生产配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.jielin.message.po  # 注意：对应实体类的路径
+  configuration:
+    map-underscore-to-camel-case: true #驼峰转换
+
+#白名单设置
+white:
+  access:
+    - 127.0.0.1
+    - 0:0:0:0:0:0:0:1
+    - 121.43.235.99
+
+#app推送配置,enabled同时只能有一个推送的sdk为true
+app-push:
+  jgPush:
+    appKey: xxx
+    masterSecret: xxx
+  uniPush:
+    providerAppId: xxx
+    providerAppSecret: xxx
+    providerAppKey: xxx
+    providerMasterSecret: xxx
+    customerAppId: xxx
+    customerAppSecret: xxx
+    customerAppKey: xxx
+    customerMasterSecret: xxx
+    url: http://sdk.open.api.igexin.com/apiex.htm
+
+#短信配置
+ytxsms:
+  serverIp: xxx.xxx.com
+  serverPort: 8883
+  accountSid: xxx
+  accountToken: xxx
+  appId: xxx
+
+#微信配置文件
+wechat:
+  #公众号
+  weChatGzhs:
+    - systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+  #小程序
+  weChatMps:
+    - #悦姐小程序
+      systemApply: provider
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order/order
+    - #用户订单系统小程序
+      systemApply: customer_order
+      appid: xxx
+      appsecret: xxx
+      pagepath: /pages/order-list/order-list?code=-1&parent=0
+
+#第三方接口调用
+third:
+  #  jlWebApiUrl: http://xxx.com/jielin-web
+  jlWebApiUrl: https://xxx.com
+  jlWebUserName: xxx
+  jlWebPassword: xxx
+
+#钉钉推送（此处的组织信息为餐饮的组织信息）
+dingtalk:
+  agentId: 1236320527
+  appKey: xxx
+  appSecret: xxx
+  contractProcessCode: xxx
+
+#apollo配置中心
+app:
+  id: jielin-msg
+apollo:
+  meta: http://xxx.com:30377
+  bootstrap:
+    enabled: true
+    eagerLoad:
+      enabled: true
